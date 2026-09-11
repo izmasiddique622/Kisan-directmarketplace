@@ -16,7 +16,10 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = os.getenv("FLASK_SECRET_KEY") or "development-only-change-this-key"
+app.secret_key = os.getenv(
+    "FLASK_SECRET_KEY",
+    "development-only-change-this-key"
+)
 
 
 # =========================================================
@@ -24,7 +27,6 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY") or "development-only-change-this-
 # =========================================================
 
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS", "")
-
 EMAIL_APP_PASSWORD = os.getenv("EMAIL_APP_PASSWORD", "")
 
 SMTP_SERVER = "smtp.gmail.com"
@@ -40,7 +42,13 @@ def send_email(to_email, subject, message):
     try:
 
         if not to_email or not EMAIL_ADDRESS or not EMAIL_APP_PASSWORD:
-            print("EMAIL NOT CONFIGURED: Set EMAIL_ADDRESS and EMAIL_APP_PASSWORD in .env")
+
+            print(
+                "EMAIL NOT CONFIGURED: "
+                "Set EMAIL_ADDRESS and EMAIL_APP_PASSWORD "
+                "in environment variables."
+            )
+
             return False
 
         email = EmailMessage()
@@ -88,15 +96,32 @@ def get_db_connection():
 
     return mysql.connector.connect(
 
-        host=os.getenv("MYSQL_HOST", "localhost"),
+        host=os.getenv(
+            "MYSQL_HOST",
+            "localhost"
+        ),
 
-        port=int(os.getenv("MYSQL_PORT", "3306")),
+        port=int(
+            os.getenv(
+                "MYSQL_PORT",
+                "3306"
+            )
+        ),
 
-        user=os.getenv("MYSQL_USER", "root"),
+        user=os.getenv(
+            "MYSQL_USER",
+            "root"
+        ),
 
-        password=os.getenv("MYSQL_PASSWORD", ""),
+        password=os.getenv(
+            "MYSQL_PASSWORD",
+            ""
+        ),
 
-        database=os.getenv("MYSQL_DATABASE", "kisan_direct_marketplace")
+        database=os.getenv(
+            "MYSQL_DATABASE",
+            "kisan_direct_marketplace"
+        )
     )
 
 
@@ -390,7 +415,6 @@ def farmer_login():
 
             if db:
                 db.close()
-
 
     return render_template(
         "farmer_login.html"
@@ -1166,6 +1190,287 @@ def add_product():
 
 
 # =========================================================
+# EDIT FARMER PRODUCT
+# =========================================================
+
+@app.route(
+    "/edit-product/<int:product_id>",
+    methods=["GET", "POST"]
+)
+def edit_product(product_id):
+
+    if "user_id" not in session:
+
+        flash(
+            "Please login as a farmer first.",
+            "warning"
+        )
+
+        return redirect(
+            url_for("farmer_login")
+        )
+
+    if session.get("role") != "farmer":
+
+        flash(
+            "Only farmers can edit products.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+    farmer_id = session["user_id"]
+
+    db = None
+    cursor = None
+
+    try:
+
+        db = get_db_connection()
+
+        cursor = db.cursor(
+            dictionary=True
+        )
+
+        # =================================================
+        # GET PRODUCT
+        # =================================================
+
+        cursor.execute("""
+
+            SELECT
+                id,
+                farmer_id,
+                name,
+                category,
+                price,
+                unit,
+                location,
+                image
+
+            FROM products
+
+            WHERE id = %s
+
+            AND farmer_id = %s
+
+        """, (
+            product_id,
+            farmer_id
+        ))
+
+        product = cursor.fetchone()
+
+        if not product:
+
+            flash(
+                "Product not found or you cannot edit this product.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("farmer")
+            )
+
+        # =================================================
+        # SHOW EDIT FORM
+        # =================================================
+
+        if request.method == "GET":
+
+            return render_template(
+                "edit_product.html",
+                product=product
+            )
+
+        # =================================================
+        # GET FORM DATA
+        # =================================================
+
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
+
+        category = request.form.get(
+            "category",
+            ""
+        ).strip()
+
+        price = request.form.get(
+            "price",
+            ""
+        ).strip()
+
+        unit = request.form.get(
+            "unit",
+            ""
+        ).strip()
+
+        location = request.form.get(
+            "location",
+            ""
+        ).strip()
+
+        image = request.form.get(
+            "image",
+            ""
+        ).strip()
+
+        # =================================================
+        # VALIDATION
+        # =================================================
+
+        if not name:
+
+            flash(
+                "Please enter product name.",
+                "danger"
+            )
+
+            return render_template(
+                "edit_product.html",
+                product=product
+            )
+
+        if not category:
+
+            flash(
+                "Please select a category.",
+                "danger"
+            )
+
+            return render_template(
+                "edit_product.html",
+                product=product
+            )
+
+        if not price:
+
+            flash(
+                "Please enter product price.",
+                "danger"
+            )
+
+            return render_template(
+                "edit_product.html",
+                product=product
+            )
+
+        if not unit:
+
+            flash(
+                "Please select product unit.",
+                "danger"
+            )
+
+            return render_template(
+                "edit_product.html",
+                product=product
+            )
+
+        try:
+
+            price_value = float(price)
+
+            if price_value < 0:
+
+                flash(
+                    "Price cannot be negative.",
+                    "danger"
+                )
+
+                return render_template(
+                    "edit_product.html",
+                    product=product
+                )
+
+        except ValueError:
+
+            flash(
+                "Please enter a valid price.",
+                "danger"
+            )
+
+            return render_template(
+                "edit_product.html",
+                product=product
+            )
+
+        # =================================================
+        # UPDATE PRODUCT
+        # =================================================
+
+        cursor.execute("""
+
+            UPDATE products
+
+            SET
+                name = %s,
+                category = %s,
+                price = %s,
+                unit = %s,
+                location = %s,
+                image = %s
+
+            WHERE id = %s
+
+            AND farmer_id = %s
+
+        """, (
+            name,
+            category,
+            price_value,
+            unit,
+            location,
+            image,
+            product_id,
+            farmer_id
+        ))
+
+        db.commit()
+
+        flash(
+            "Product updated successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
+
+    except Error as e:
+
+        if db:
+            db.rollback()
+
+        print(
+            "EDIT PRODUCT ERROR:",
+            e
+        )
+
+        flash(
+            "Unable to update product: "
+            + str(e),
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if db:
+            db.close()
+
+
+# =========================================================
 # DELETE FARMER PRODUCT
 # =========================================================
 
@@ -1822,6 +2127,9 @@ def remove_from_cart(cart_id):
         return redirect(
             url_for("buyer")
         )
+
+    db = None
+    cursor = None
 
     try:
 
@@ -2763,7 +3071,7 @@ def contact():
         )
 
         # =================================================
-        # SEND CONTACT MESSAGE TO YOUR EMAIL
+        # SEND CONTACT MESSAGE
         # =================================================
 
         email_sent = send_email(
@@ -2804,5 +3112,10 @@ if __name__ == "__main__":
     app.run(
         debug=False,
         host="0.0.0.0",
-        port=int(os.getenv("PORT", "5000"))
+        port=int(
+            os.getenv(
+                "PORT",
+                "5000"
+            )
+        )
     )
