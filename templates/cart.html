@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Cart - Kisan Direct Marketplace</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f8f4;
+            color: #222;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #198754;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 9px 14px;
+            border-radius: 7px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            background: #146c43;
+        }
+
+        /* CONTAINER */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 35px auto;
+        }
+
+        /* TITLE */
+        .page-title {
+            background: white;
+            padding: 28px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            color: #176b35;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+        }
+
+        /* FLASH MESSAGE */
+        .message {
+            padding: 13px 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #d1e7dd;
+            color: #0f5132;
+            font-weight: bold;
+        }
+
+        /* CART */
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+        }
+
+        .cart-section,
+        .summary {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+        }
+
+        .cart-section h2,
+        .summary h2 {
+            color: #176b35;
+            margin-bottom: 20px;
+        }
+
+        /* CART ITEM */
+        .cart-item {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            background: #fff;
+        }
+
+        .cart-image {
+            width: 130px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #eee;
+        }
+
+        .cart-info {
+            flex: 1;
+        }
+
+        .cart-info h3 {
+            color: #176b35;
+            margin-bottom: 8px;
+        }
+
+        .cart-info p {
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #198754;
+            font-size: 18px;
+        }
+
+        /* QUANTITY */
+        .quantity-area {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quantity-area span {
+            font-weight: bold;
+            padding: 7px 12px;
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-block;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        .btn-green {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background: #146c43;
+        }
+
+        .btn-blue {
+            background: #0d6efd;
+            color: white;
+        }
+
+        .btn-blue:hover {
+            background: #0b5ed7;
+        }
+
+        .btn-red {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-red:hover {
+            background: #bb2d3b;
+        }
+
+        .btn-gray {
+            background: #6c757d;
+            color: white;
+        }
+
+        /* SUMMARY */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-total {
+            font-size: 22px;
+            font-weight: bold;
+            color: #198754;
+            margin-top: 15px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+            padding: 13px;
+            font-size: 17px;
+        }
+
+        .clear-btn {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* EMPTY */
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #777;
+        }
+
+        .empty h2 {
+            color: #176b35;
+            margin-bottom: 10px;
+        }
+
+        .empty p {
+            margin-bottom: 20px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #146c43;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 50px;
+        }
+
+        /* MOBILE */
+        @media(max-width: 800px) {
+
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cart-image {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        👨‍🌾 Kisan Direct Marketplace
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/">
+            🏠 Home
+        </a>
+
+        <a href="/buyer">
+            🛒 Marketplace
+        </a>
+
+        <a href="/cart">
+            🛍️ Cart
+        </a>
+
+        <a href="/orders">
+            📦 My Orders
+        </a>
+
+        <a href="/logout">
+            🚪 Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- MAIN -->
+
+<div class="container">
+
+    <!-- TITLE -->
+
+    <div class="page-title">
+
+        <h1>
+            🛒 My Shopping Cart
+        </h1>
+
+        <p>
+            Review your products before placing your order.
+        </p>
+
+    </div>
+
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    {% if cart_items %}
+
+    <div class="cart-layout">
+
+        <!-- CART PRODUCTS -->
+
+        <div class="cart-section">
+
+            <h2>
+                🌾 Cart Products
+            </h2>
+
+
+            {% for item in cart_items %}
+
+            <div class="cart-item">
+
+                <!-- IMAGE -->
+
+                {% if item["image"] %}
+
+                    <img
+                        src="{{ item['image'] }}"
+                        alt="{{ item['product_name'] }}"
+                        class="cart-image"
+                        onerror="this.src='https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80';"
+                    >
+
+                {% else %}
+
+                    <img
+                        src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80"
+                        alt="Farm Product"
+                        class="cart-image"
+                    >
+
+                {% endif %}
+
+
+                <!-- INFORMATION -->
+
+                <div class="cart-info">
+
+                    <h3>
+                        {{ item["product_name"] }}
+                    </h3>
+
+                    <p>
+                        <strong>Farmer:</strong>
+                        {{ item["farmer"] }}
+                    </p>
+
+                    <p>
+                        <strong>Location:</strong>
+                        {{ item["location"] }}
+                    </p>
+
+                    <p>
+                        <strong>Unit:</strong>
+                        {{ item["unit"] }}
+                    </p>
+
+                    <p class="price">
+                        ₹{{ "%.2f"|format(item["price"]|float) }}
+                    </p>
+
+
+                    <!-- QUANTITY -->
+
+                    <div class="quantity-area">
+
+                        <strong>Quantity:</strong>
+
+                        <!-- DECREASE -->
+
+                        <a
+                            href="{{ url_for('decrease_cart', cart_id=item['id']) }}"
+                            class="btn btn-gray"
+                        >
+                            −
+                        </a>
+
+
+                        <span>
+                            {{ item["quantity"] }}
+                        </span>
+
+
+                        <!-- INCREASE -->
+
+                        <a
+                            href="{{ url_for('increase_cart', cart_id=item['id']) }}"
+                            class="btn btn-green"
+                        >
+                            +
+                        </a>
+
+
+                        <!-- REMOVE -->
+
+                        <a
+                            href="{{ url_for('remove_from_cart', cart_id=item['id']) }}"
+                            class="btn btn-red"
+                            onclick="return confirm('Remove this product from cart?');"
+                        >
+                            🗑️ Remove
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div class="summary">
+
+            <h2>
+                🧾 Cart Summary
+            </h2>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Total Products
+                </span>
+
+                <strong>
+                    {{ cart_items|length }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Total Quantity
+                </span>
+
+                <strong>
+                    {{ total_items }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Subtotal
+                </span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(subtotal|float) }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row summary-total">
+
+                <span>
+                    Total
+                </span>
+
+                <span>
+                    ₹{{ "%.2f"|format(subtotal|float) }}
+                </span>
+
+            </div>
+
+
+            <!-- CHECKOUT -->
+
+            <a
+                href="{{ url_for('checkout') }}"
+                class="btn btn-green checkout-btn"
+            >
+                💳 Proceed to Checkout
+            </a>
+
+
+            <!-- CLEAR -->
+
+            <a
+                href="{{ url_for('clear_cart') }}"
+                class="btn btn-red clear-btn"
+                onclick="return confirm('Are you sure you want to clear your entire cart?');"
+            >
+                🗑️ Clear Cart
+            </a>
+
+
+            <!-- CONTINUE -->
+
+            <a
+                href="{{ url_for('buyer') }}"
+                class="btn btn-blue clear-btn"
+            >
+                🌾 Continue Shopping
+            </a>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <!-- EMPTY CART -->
+
+    <div class="cart-section">
+
+        <div class="empty">
+
+            <h2>
+                🛒 Your Cart is Empty
+            </h2>
+
+            <p>
+                You have not added any products yet.
+            </p>
+
+            <a
+                href="{{ url_for('buyer') }}"
+                class="btn btn-green"
+            >
+                🌾 Browse Products
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    <p>
+        © 2026 Kisan Direct Marketplace
+    </p>
+
+    <p style="margin-top:8px;">
+        🌱 Fresh products directly from farmers
+    </p>
+
+</footer>
+
+</body>
+</html>

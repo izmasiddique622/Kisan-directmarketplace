@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Kisan Direct Marketplace</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+
+        body {
+            background: #f4f8f4;
+        }
+
+        .login-box {
+            max-width: 450px;
+            margin: 80px auto;
+            padding: 35px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.12);
+        }
+
+        .logo {
+            font-size: 30px;
+            font-weight: bold;
+            color: #198754;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="login-box">
+
+        <div class="text-center">
+
+            <div class="logo">
+                🌾 Kisan Direct
+            </div>
+
+            <h4 class="mt-2 mb-4">
+                Marketplace Login
+            </h4>
+
+        </div>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <form method="POST" action="{{ url_for('login') }}">
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="Enter your email"
+                    required>
+
+            </div>
+
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    class="form-control"
+                    placeholder="Enter your password"
+                    required>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="btn btn-success w-100">
+
+                Login
+
+            </button>
+
+        </form>
+
+
+        <div class="text-center mt-4">
+
+            <a
+                href="{{ url_for('home') }}"
+                class="text-success text-decoration-none">
+
+                ← Back to Home
+
+            </a>
+
+        </div>
+
+
+        <div class="text-center mt-4">
+
+            <small class="text-muted">
+
+                Demo Login:<br>
+
+                <strong>buyer@gmail.com</strong><br>
+
+                Password: <strong>123456</strong>
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

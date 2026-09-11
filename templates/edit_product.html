@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Product | Kisan Direct Marketplace</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f8f3;
+            color: #26352a;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            background: #198754;
+            color: white;
+            padding: 15px 6%;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .dashboard-link {
+            background: white;
+            color: #198754 !important;
+            padding: 9px 15px;
+            border-radius: 20px;
+        }
+
+        /* CONTAINER */
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            padding: 45px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            color: #176b35;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #777;
+        }
+
+        /* FORM CARD */
+
+        .form-card {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+
+            color: #333;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+
+            padding: 13px;
+
+            border: 1px solid #ccc;
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            background: white;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+
+            border-color: #198754;
+
+            box-shadow: 0 0 5px rgba(25,135,84,0.25);
+        }
+
+        .current-image {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .current-image img {
+            width: 180px;
+            height: 120px;
+
+            object-fit: cover;
+
+            border-radius: 10px;
+
+            border: 1px solid #ddd;
+        }
+
+        .help-text {
+            color: #777;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        /* BUTTONS */
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .save-btn {
+            flex: 1;
+
+            border: none;
+
+            background: #198754;
+            color: white;
+
+            padding: 13px;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background: #146c43;
+        }
+
+        .cancel-btn {
+            flex: 1;
+
+            text-align: center;
+
+            background: #6c757d;
+            color: white;
+
+            padding: 13px;
+
+            border-radius: 8px;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+        .cancel-btn:hover {
+            background: #5c636a;
+        }
+
+        /* FLASH MESSAGE */
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 13px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #664d03;
+        }
+
+        /* FOOTER */
+
+        footer {
+            margin-top: 40px;
+
+            background: #176b35;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 25px;
+        }
+
+        footer p {
+            margin: 5px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 650px) {
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                padding: 30px 15px;
+            }
+
+            .form-card {
+                padding: 25px 20px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .page-title h1 {
+                font-size: 27px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🌾 Kisan Direct Marketplace
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('farmer') }}" class="dashboard-link">
+                👨‍🌾 Farmer Dashboard
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN -->
+
+    <div class="container">
+
+        <div class="page-title">
+
+            <h1>
+                ✏️ Edit Product
+            </h1>
+
+            <p>
+                Update your product information below.
+            </p>
+
+        </div>
+
+
+        <!-- FLASH MESSAGES -->
+
+        <div class="messages">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <div class="form-card">
+
+            <form method="POST"
+                  action="{{ url_for('edit_product', product_id=product['id']) }}">
+
+
+                <!-- PRODUCT NAME -->
+
+                <div class="form-group">
+
+                    <label for="name">
+                        Product Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{ product['name'] }}"
+                        placeholder="Example: Fresh Tomatoes"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CATEGORY -->
+
+                <div class="form-group">
+
+                    <label for="category">
+                        Category
+                    </label>
+
+                    <select
+                        id="category"
+                        name="category"
+                        required
+                    >
+
+                        <option value="">
+                            Select Category
+                        </option>
+
+                        <option value="Vegetables"
+                            {% if product['category'] == 'Vegetables' %}selected{% endif %}>
+                            🥕 Vegetables
+                        </option>
+
+                        <option value="Fruits"
+                            {% if product['category'] == 'Fruits' %}selected{% endif %}>
+                            🍎 Fruits
+                        </option>
+
+                        <option value="Grains"
+                            {% if product['category'] == 'Grains' %}selected{% endif %}>
+                            🌾 Grains
+                        </option>
+
+                        <option value="Pulses"
+                            {% if product['category'] == 'Pulses' %}selected{% endif %}>
+                            🫘 Pulses
+                        </option>
+
+                        <option value="Dairy"
+                            {% if product['category'] == 'Dairy' %}selected{% endif %}>
+                            🥛 Dairy
+                        </option>
+
+                        <option value="Other"
+                            {% if product['category'] == 'Other' %}selected{% endif %}>
+                            📦 Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- PRICE -->
+
+                <div class="form-group">
+
+                    <label for="price">
+                        Price (₹)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="price"
+                        name="price"
+                        value="{{ product['price'] }}"
+                        step="0.01"
+                        min="0"
+                        placeholder="Enter price"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- UNIT -->
+
+                <div class="form-group">
+
+                    <label for="unit">
+                        Unit
+                    </label>
+
+                    <select
+                        id="unit"
+                        name="unit"
+                        required
+                    >
+
+                        <option value="">
+                            Select Unit
+                        </option>
+
+                        <option value="kg"
+                            {% if product['unit'] == 'kg' %}selected{% endif %}>
+                            Kilogram (kg)
+                        </option>
+
+                        <option value="gram"
+                            {% if product['unit'] == 'gram' %}selected{% endif %}>
+                            Gram
+                        </option>
+
+                        <option value="piece"
+                            {% if product['unit'] == 'piece' %}selected{% endif %}>
+                            Piece
+                        </option>
+
+                        <option value="litre"
+                            {% if product['unit'] == 'litre' %}selected{% endif %}>
+                            Litre
+                        </option>
+
+                        <option value="dozen"
+                            {% if product['unit'] == 'dozen' %}selected{% endif %}>
+                            Dozen
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- FARMER NAME -->
+
+                <div class="form-group">
+
+                    <label for="farmer">
+                        Farmer Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="farmer"
+                        name="farmer"
+                        value="{{ product['farmer'] }}"
+                        placeholder="Enter farmer name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div class="form-group">
+
+                    <label for="location">
+                        Farm Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        value="{{ product['location'] }}"
+                        placeholder="Example: Pune, Maharashtra"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- IMAGE -->
+
+                <div class="form-group">
+
+                    <label for="image">
+                        Product Image URL
+                    </label>
+
+                    <input
+                        type="url"
+                        id="image"
+                        name="image"
+                        value="{{ product['image'] or '' }}"
+                        placeholder="https://example.com/image.jpg"
+                    >
+
+                    <p class="help-text">
+                        Enter a new image URL or keep the existing image.
+                    </p>
+
+                    {% if product['image'] %}
+
+                        <div class="current-image">
+
+                            <p class="help-text">
+                                Current Image:
+                            </p>
+
+                            <img
+                                src="{{ product['image'] }}"
+                                alt="{{ product['name'] }}"
+                                onerror="this.style.display='none'"
+                            >
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="buttons">
+
+                    <button
+                        type="submit"
+                        class="save-btn"
+                    >
+                        💾 Save Changes
+                    </button>
+
+                    <a
+                        href="{{ url_for('farmer') }}"
+                        class="cancel-btn"
+                    >
+                        ❌ Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            © 2026 Kisan Direct Marketplace
+        </p>
+
+        <p>
+            🌱 Fresh products directly from farmers
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

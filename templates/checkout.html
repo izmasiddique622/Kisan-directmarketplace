@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Checkout | Kisan Direct Marketplace</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f8f3;
+            color: #26352a;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            background: #198754;
+            color: white;
+            padding: 15px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .cart-link {
+            background: white;
+            color: #198754 !important;
+            padding: 9px 16px;
+            border-radius: 20px;
+        }
+
+        /* ================= CONTAINER ================= */
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .page-title h1 {
+            color: #176b35;
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #777;
+        }
+
+        /* ================= FLASH ================= */
+
+        .messages {
+            max-width: 700px;
+            margin: 0 auto 25px;
+        }
+
+        .alert {
+            padding: 13px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #664d03;
+        }
+
+        /* ================= GRID ================= */
+
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 25px;
+        }
+
+        .box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .box h2 {
+            color: #176b35;
+            font-size: 22px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e8eee9;
+            padding-bottom: 12px;
+        }
+
+        /* ================= FORM ================= */
+
+        .delivery-icon {
+            font-size: 30px;
+            margin-right: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #198754;
+            box-shadow: 0 0 5px rgba(25,135,84,0.25);
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .email-info {
+            font-size: 13px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        /* ================= PAYMENT ================= */
+
+        .payment-option {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .payment-option:hover {
+            border-color: #198754;
+            background: #f7fbf8;
+        }
+
+        .payment-option label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .payment-option input[type="radio"] {
+            width: auto;
+        }
+
+        .payment-name {
+            font-weight: bold;
+        }
+
+        .payment-description {
+            color: #777;
+            font-size: 13px;
+            margin-left: 27px;
+            margin-top: 4px;
+        }
+
+        /* ================= UPI ================= */
+
+        .upi-payment-box {
+            display: none;
+            margin-top: 18px;
+            padding: 20px;
+            background: #f5f8f3;
+            border: 1px solid #cfe3d5;
+            border-radius: 12px;
+        }
+
+        .upi-payment-box h3 {
+            color: #176b35;
+            margin-bottom: 15px;
+        }
+
+        /* EXACT PAYMENT AMOUNT */
+
+        .upi-amount-box {
+            background: #e9f7ee;
+            border: 2px solid #198754;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .upi-amount-label {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .upi-amount {
+            color: #198754;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .upi-amount-help {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .upi-id-box {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upi-id-text {
+            color: #198754;
+            font-size: 17px;
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            border: none;
+            background: #198754;
+            color: white;
+            padding: 8px 13px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #146c43;
+        }
+
+        /* ================= UPI QR ================= */
+
+        .upi-payment-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 22px;
+            align-items: start;
+            margin-top: 18px;
+        }
+
+        .upi-qr-section {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .upi-qr {
+            width: 190px;
+            height: 190px;
+            max-width: 100%;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        .upi-qr-title {
+            color: #176b35;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .upi-qr-help {
+            color: #777;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .upi-details-section {
+            min-width: 0;
+        }
+
+        @media (max-width: 600px) {
+
+            .upi-payment-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .upi-qr-section {
+                max-width: 250px;
+                margin: 0 auto;
+            }
+
+        }
+
+        .upi-note {
+            margin-top: 15px;
+            background: white;
+            border-left: 4px solid #198754;
+            padding: 12px;
+            border-radius: 6px;
+            color: #555;
+            font-size: 13px;
+        }
+
+        /* ================= ORDER SUMMARY ================= */
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-left {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .summary-image {
+            width: 65px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 7px;
+            background: #eee;
+        }
+
+        .summary-name {
+            font-weight: bold;
+            color: #26352a;
+        }
+
+        .summary-details {
+            color: #777;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .summary-price {
+            color: #198754;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            border-top: 2px solid #198754;
+            margin-top: 20px;
+            padding-top: 18px;
+            font-size: 23px;
+            font-weight: bold;
+            color: #198754;
+        }
+
+        /* ================= DELIVERY NOTE ================= */
+
+        .delivery-note {
+            background: #f5f8f3;
+            border-left: 4px solid #198754;
+            padding: 13px;
+            border-radius: 6px;
+            margin-top: 15px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .place-order-btn {
+            width: 100%;
+            border: none;
+            background: #198754;
+            color: white;
+            padding: 15px;
+            border-radius: 9px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .place-order-btn:hover {
+            background: #146c43;
+        }
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            background: #e9f2ec;
+            color: #176b35;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 12px;
+        }
+
+        .back-btn:hover {
+            background: #dcebe1;
+        }
+
+        .secure-box {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            margin-top: 40px;
+            background: #176b35;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        footer p {
+            margin: 5px;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title h1 {
+                font-size: 28px;
+            }
+
+            .upi-id-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .copy-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🌾 Kisan Direct Marketplace
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('buyer') }}">
+                Products
+            </a>
+
+            <a href="{{ url_for('cart') }}" class="cart-link">
+                🛒 Cart
+            </a>
+
+            <a href="{{ url_for('orders') }}">
+                Orders
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <div class="container">
+
+        <div class="page-title">
+
+            <h1>
+                🛍️ Checkout
+            </h1>
+
+            <p>
+                Complete your delivery details and place your order.
+            </p>
+
+        </div>
+
+
+        <!-- ================= FLASH MESSAGES ================= -->
+
+        <div class="messages">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+        </div>
+
+
+        <!-- ================= CHECKOUT FORM ================= -->
+
+        <form
+            method="POST"
+            action="{{ url_for('place_order') }}"
+        >
+
+            <div class="checkout-grid">
+
+
+                <!-- ================= LEFT SIDE ================= -->
+
+                <div>
+
+
+                    <!-- ================= DELIVERY DETAILS ================= -->
+
+                    <div class="box">
+
+                        <h2>
+
+                            <span class="delivery-icon">
+                                🚚
+                            </span>
+
+                            Delivery Details
+
+                        </h2>
+
+
+                        <!-- CUSTOMER NAME -->
+
+                        <div class="form-group">
+
+                            <label for="customer_name">
+
+                                Customer Name
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="customer_name"
+                                name="customer_name"
+                                placeholder="Enter your full name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="form-group">
+
+                            <label for="email">
+
+                                Email Address
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="Enter your email address"
+                                required
+                            >
+
+                            <div class="email-info">
+                                📧 Your order confirmation will be sent to this email address.
+                            </div>
+
+                        </div>
+
+
+                        <!-- PHONE + PINCODE -->
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+
+                                <label for="phone">
+
+                                    Phone Number
+
+                                    <span class="required">
+                                        *
+                                    </span>
+
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    placeholder="Enter phone number"
+                                    maxlength="15"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="pincode">
+
+                                    PIN Code
+
+                                    <span class="required">
+                                        *
+                                    </span>
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="pincode"
+                                    name="pincode"
+                                    placeholder="Enter PIN code"
+                                    maxlength="6"
+                                    pattern="[0-9]{6}"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- HOUSE -->
+
+                        <div class="form-group">
+
+                            <label for="house">
+
+                                House / Building
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="house"
+                                name="house"
+                                placeholder="House number, building name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- ADDRESS -->
+
+                        <div class="form-group">
+
+                            <label for="address">
+
+                                Complete Delivery Address
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <textarea
+                                id="address"
+                                name="address"
+                                placeholder="Enter street, area, village/locality and complete address"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- CITY + STATE -->
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+
+                                <label for="city">
+
+                                    City / Village
+
+                                    <span class="required">
+                                        *
+                                    </span>
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="city"
+                                    name="city"
+                                    placeholder="Enter city or village"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="state">
+
+                                    State
+
+                                    <span class="required">
+                                        *
+                                    </span>
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="state"
+                                    name="state"
+                                    placeholder="Enter state"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- INSTRUCTIONS -->
+
+                        <div class="form-group">
+
+                            <label for="instructions">
+                                Delivery Instructions
+                            </label>
+
+                            <textarea
+                                id="instructions"
+                                name="instructions"
+                                placeholder="Example: Please deliver in the morning..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- DELIVERY NOTE -->
+
+                        <div class="delivery-note">
+
+                            🚚
+
+                            <strong>
+                                Delivery Information:
+                            </strong>
+
+                            Your order will be delivered to the address
+                            provided above. Please make sure your phone,
+                            email and address are correct.
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================= PAYMENT ================= -->
+
+                    <div class="box">
+
+                        <h2>
+                            💳 Payment Option
+                        </h2>
+
+
+                        <!-- COD -->
+
+                        <div class="payment-option">
+
+                            <label>
+
+                                <input
+                                    type="radio"
+                                    name="payment_method"
+                                    value="Cash on Delivery"
+                                    checked
+                                    onchange="showUPIPayment()"
+                                >
+
+                                <span class="payment-name">
+                                    💵 Cash on Delivery
+                                </span>
+
+                            </label>
+
+                            <div class="payment-description">
+
+                                Pay when your order is delivered.
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- UPI -->
+
+                        <div class="payment-option">
+
+                            <label>
+
+                                <input
+                                    type="radio"
+                                    name="payment_method"
+                                    value="UPI"
+                                    onchange="showUPIPayment()"
+                                >
+
+                                <span class="payment-name">
+                                    📱 UPI Payment
+                                </span>
+
+                            </label>
+
+                            <div class="payment-description">
+
+                                Pay manually using any UPI app.
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================= MANUAL UPI BOX ================= -->
+
+                        <div
+                            id="upi-payment-box"
+                            class="upi-payment-box"
+                        >
+
+                            <h3>
+                                📱 Manual UPI Payment
+                            </h3>
+
+
+                            <p style="margin-bottom:10px; color:#555;">
+
+                                Pay the total order amount using the UPI ID below:
+
+                            </p>
+
+
+                            <!-- ================= EXACT AMOUNT ================= -->
+
+                            <div class="upi-amount-box">
+
+                                <div class="upi-amount-label">
+
+                                    💰 You must pay exactly
+
+                                </div>
+
+                                <div class="upi-amount">
+
+                                    ₹{{ "%.2f"|format(total|float) }}
+
+                                </div>
+
+                                <div class="upi-amount-help">
+
+                                    This amount must exactly match your order total.
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ================= UPI PAYMENT LAYOUT ================= -->
+
+                            <div class="upi-payment-layout">
+
+
+                                <!-- QR CODE -->
+
+                                <div class="upi-qr-section">
+
+                                    <div class="upi-qr-title">
+                                        📷 Scan & Pay
+                                    </div>
+
+                                    <img
+                                        src="{{ url_for('static', filename='upi_qr.png') }}"
+                                        alt="UPI QR Code"
+                                        class="upi-qr"
+                                    >
+
+                                    <div class="upi-qr-help">
+
+                                        Scan this QR code using any UPI app.
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- UPI DETAILS -->
+
+                                <div class="upi-details-section">
+
+                                    <div class="upi-id-box">
+
+                                        <strong
+                                            id="upi-id"
+                                            class="upi-id-text"
+                                        >
+                                            izmasiddique622@okicici
+                                        </strong>
+
+                                        <button
+                                            type="button"
+                                            class="copy-btn"
+                                            onclick="copyUPI()"
+                                        >
+                                            📋 Copy UPI ID
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ================= STEPS ================= -->
+
+                            <p
+                                style="
+                                    margin-top:15px;
+                                    color:#555;
+                                    font-weight:bold;
+                                "
+                            >
+                                Payment Steps:
+                            </p>
+
+
+                            <ol class="upi-steps">
+
+                                <li>
+                                    Open your UPI app.
+                                </li>
+
+                                <li>
+                                    Send exactly the order total shown above.
+                                </li>
+
+                                <li>
+                                    Complete the payment in your UPI app.
+                                </li>
+
+                                <li>
+                                    Copy the UPI Transaction ID / UTR number.
+                                </li>
+
+                                <li>
+                                    Enter the Transaction ID below.
+                                </li>
+
+                            </ol>
+
+
+                            <!-- ================= PAYMENT AMOUNT ================= -->
+
+                            <div
+                                class="form-group"
+                                style="margin-top:18px;"
+                            >
+
+                                <label for="payment_amount">
+
+                                    UPI Payment Amount
+
+                                    <span class="required">
+                                        *
+                                    </span>
+
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="payment_amount"
+                                    name="payment_amount"
+                                    step="0.01"
+                                    min="0"
+                                    placeholder="Enter amount paid"
+                                >
+
+                                <div
+                                    style="
+                                        color:#777;
+                                        font-size:13px;
+                                        margin-top:5px;
+                                    "
+                                >
+
+                                    Enter exactly ₹{{ "%.2f"|format(total|float) }}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ================= TRANSACTION ID ================= -->
+
+                            <div
+                                class="form-group"
+                                style="margin-top:18px;"
+                            >
+
+                                <label for="transaction_id">
+
+                                    UPI Transaction ID / UTR
+
+                                    <span class="required">
+                                        *
+                                    </span>
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="transaction_id"
+                                    name="transaction_id"
+                                    placeholder="Enter UPI Transaction ID / UTR"
+                                    maxlength="100"
+                                >
+
+                                <div
+                                    style="
+                                        color:#777;
+                                        font-size:13px;
+                                        margin-top:5px;
+                                    "
+                                >
+
+                                    Enter the transaction/reference number received after payment.
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PAYMENT STATUS -->
+
+                            <input
+                                type="hidden"
+                                id="payment_status"
+                                name="payment_status"
+                                value="Pending"
+                            >
+
+
+                            <div class="upi-note">
+
+                                🔒 Your transaction ID will be saved with your order.
+
+                                Payment verification can be done by the marketplace
+                                before confirming the payment.
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="secure-box">
+
+                            🔒 Your payment information is securely submitted
+                            to the marketplace.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= RIGHT SIDE ================= -->
+
+                <div>
+
+                    <div class="box">
+
+                        <h2>
+                            📦 Order Summary
+                        </h2>
+
+
+                        {% if cart_items %}
+
+
+                            {% for item in cart_items %}
+
+                                <div class="summary-item">
+
+                                    <div class="summary-left">
+
+                                        <img
+                                            class="summary-image"
+                                            src="{{ item['image'] or 'https://placehold.co/300x200?text=No+Image' }}"
+                                            alt="{{ item['product_name'] }}"
+                                            onerror="this.src='https://placehold.co/300x200?text=No+Image'"
+                                        >
+
+                                        <div>
+
+                                            <div class="summary-name">
+                                                {{ item["product_name"] }}
+                                            </div>
+
+                                            <div class="summary-details">
+
+                                                ₹{{ "%.2f"|format(item["price"]|float) }}
+
+                                                ×
+
+                                                {{ item["quantity"] }}
+
+                                                {{ item["unit"] }}
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="summary-price">
+
+                                        ₹{{ "%.2f"|format(
+                                            (item["price"]|float)
+                                            *
+                                            (item["quantity"]|int)
+                                        ) }}
+
+                                    </div>
+
+                                </div>
+
+                            {% endfor %}
+
+
+                            <!-- TOTAL -->
+
+                            <div class="total-row">
+
+                                <span>
+                                    Total
+                                </span>
+
+                                <span>
+                                    ₹{{ "%.2f"|format(total|float) }}
+                                </span>
+
+                            </div>
+
+
+                            <!-- PLACE ORDER -->
+
+                            <button
+                                type="submit"
+                                class="place-order-btn"
+                            >
+                                ✅ Place Order
+                            </button>
+
+
+                            <!-- BACK -->
+
+                            <a
+                                href="{{ url_for('cart') }}"
+                                class="back-btn"
+                            >
+                                ← Back to Cart
+                            </a>
+
+
+                        {% else %}
+
+
+                            <p
+                                style="
+                                    color:#777;
+                                    text-align:center;
+                                    padding:20px;
+                                "
+                            >
+                                Your cart is empty.
+                            </p>
+
+
+                            <a
+                                href="{{ url_for('buyer') }}"
+                                class="back-btn"
+                            >
+                                🥕 Start Shopping
+                            </a>
+
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            © 2026 Kisan Direct Marketplace
+        </p>
+
+        <p>
+            🌱 Fresh products directly from farmers
+        </p>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        function showUPIPayment() {
+
+            const selectedPayment =
+                document.querySelector(
+                    'input[name="payment_method"]:checked'
+                );
+
+            const upiBox =
+                document.getElementById(
+                    "upi-payment-box"
+                );
+
+            const transactionInput =
+                document.getElementById(
+                    "transaction_id"
+                );
+
+            const paymentAmountInput =
+                document.getElementById(
+                    "payment_amount"
+                );
+
+
+            if (
+                selectedPayment &&
+                selectedPayment.value === "UPI"
+            ) {
+
+                upiBox.style.display = "block";
+
+                transactionInput.required = true;
+
+                paymentAmountInput.required = true;
+
+            } else {
+
+                upiBox.style.display = "none";
+
+                transactionInput.required = false;
+
+                paymentAmountInput.required = false;
+
+                transactionInput.value = "";
+
+                paymentAmountInput.value = "";
+
+            }
+
+        }
+
+
+        function copyUPI() {
+
+            const upi =
+                document.getElementById(
+                    "upi-id"
+                ).innerText;
+
+
+            if (
+                navigator.clipboard &&
+                window.isSecureContext
+            ) {
+
+                navigator.clipboard.writeText(upi)
+
+                    .then(function() {
+
+                        alert(
+                            "UPI ID copied successfully: " + upi
+                        );
+
+                    })
+
+                    .catch(function() {
+
+                        alert(
+                            "Please copy the UPI ID manually: " + upi
+                        );
+
+                    });
+
+            } else {
+
+                alert(
+                    "Please copy the UPI ID manually: " + upi
+                );
+
+            }
+
+        }
+
+
+        /* Run once when page loads */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function() {
+                showUPIPayment();
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

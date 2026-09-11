@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Fresh Products | Kisan Direct Marketplace</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f8f3;
+            color: #26352a;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            background: #198754;
+            padding: 15px 6%;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            color: white;
+
+            box-shadow:
+                0 3px 12px rgba(0,0,0,0.15);
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .cart-link {
+            background: white;
+            color: #198754 !important;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-weight: bold !important;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+
+            background:
+                linear-gradient(
+                    rgba(20, 100, 55, 0.82),
+                    rgba(20, 100, 55, 0.82)
+                ),
+                url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=80");
+
+            background-size: cover;
+            background-position: center;
+
+            min-height: 310px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+
+            color: white;
+
+            padding: 40px 20px;
+        }
+
+        .hero-content {
+            max-width: 750px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        /* ================= PRODUCTS ================= */
+
+        .products-section {
+
+            max-width: 1400px;
+
+            margin: auto;
+
+            padding: 45px 30px;
+        }
+
+        .section-heading {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+        }
+
+        .section-heading h2 {
+
+            color: #176b35;
+
+            font-size: 32px;
+
+            margin-bottom: 8px;
+        }
+
+        .section-heading p {
+
+            color: #777;
+        }
+
+        /* ================= FLASH MESSAGE ================= */
+
+        .messages {
+
+            max-width: 700px;
+
+            margin: 0 auto 25px;
+
+        }
+
+        .alert {
+
+            padding: 13px 18px;
+
+            border-radius: 8px;
+
+            margin-bottom: 10px;
+
+            font-weight: bold;
+
+            text-align: center;
+        }
+
+        .alert-success {
+
+            background: #d1e7dd;
+
+            color: #0f5132;
+        }
+
+        .alert-danger {
+
+            background: #f8d7da;
+
+            color: #842029;
+        }
+
+        .alert-warning {
+
+            background: #fff3cd;
+
+            color: #664d03;
+        }
+
+        /* ================= CATEGORY ================= */
+
+        .category-buttons {
+
+            display: flex;
+
+            justify-content: center;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-bottom: 35px;
+        }
+
+        .category-btn {
+
+            border: 1px solid #198754;
+
+            background: white;
+
+            color: #198754;
+
+            padding: 10px 22px;
+
+            border-radius: 25px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+
+            background: #198754;
+
+            color: white;
+        }
+
+        /* ================= PRODUCT GRID ================= */
+
+        .product-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(250px, 1fr));
+
+            gap: 25px;
+        }
+
+        /* ================= PRODUCT CARD ================= */
+
+        .product-card {
+
+            background: white;
+
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 5px 18px rgba(0,0,0,0.08);
+
+            transition: 0.3s;
+        }
+
+        .product-card:hover {
+
+            transform: translateY(-6px);
+
+            box-shadow:
+                0 12px 25px rgba(0,0,0,0.14);
+        }
+
+        .product-image {
+
+            width: 100%;
+
+            height: 210px;
+
+            object-fit: cover;
+
+            display: block;
+
+            background: #eeeeee;
+        }
+
+        .product-info {
+
+            padding: 18px;
+        }
+
+        .product-category {
+
+            display: inline-block;
+
+            background: #e9f7ef;
+
+            color: #198754;
+
+            padding: 5px 10px;
+
+            border-radius: 15px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+            color: #243b2b;
+
+            margin-bottom: 9px;
+        }
+
+        .product-price {
+
+            color: #198754;
+
+            font-size: 21px;
+
+            font-weight: bold;
+
+            margin-bottom: 9px;
+        }
+
+        .product-farmer {
+
+            color: #666;
+
+            font-size: 14px;
+
+            margin-bottom: 7px;
+        }
+
+        .product-location {
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-bottom: 16px;
+        }
+
+        /* ================= ADD TO CART ================= */
+
+        .cart-form {
+
+            width: 100%;
+        }
+
+        .add-cart-btn {
+
+            width: 100%;
+
+            border: none;
+
+            background: #198754;
+
+            color: white;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .add-cart-btn:hover {
+
+            background: #146c43;
+        }
+
+        /* ================= EMPTY ================= */
+
+        .no-products {
+
+            text-align: center;
+
+            padding: 60px;
+
+            color: #777;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+
+            margin-top: 40px;
+
+            background: #176b35;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 25px;
+        }
+
+        footer p {
+
+            margin: 5px;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            .nav-links {
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+            }
+
+            .hero h1 {
+
+                font-size: 32px;
+            }
+
+            .hero p {
+
+                font-size: 16px;
+            }
+
+            .products-section {
+
+                padding: 35px 18px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .logo {
+
+                font-size: 19px;
+            }
+
+            .product-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+
+                min-height: 270px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        🌾 Kisan Direct Marketplace
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('buyer') }}">
+            Products
+        </a>
+
+        <a
+            href="{{ url_for('cart') }}"
+            class="cart-link">
+
+            🛒 Cart
+
+        </a>
+
+        <a href="{{ url_for('orders') }}">
+            Orders
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            Fresh From Farmers 🌱
+        </h1>
+
+        <p>
+            Buy fresh vegetables, fruits, grains and dairy
+            products directly from local farmers.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PRODUCTS
+===================================================== -->
+
+<section class="products-section">
+
+
+    <div class="section-heading">
+
+        <h2>
+            Fresh Farm Products
+        </h2>
+
+        <p>
+            Choose your favourite products and add them to your cart.
+        </p>
+
+    </div>
+
+
+    <!-- =================================================
+         FLASH MESSAGES
+    ================================================== -->
+
+    <div class="messages">
+
+        {% with messages =
+            get_flashed_messages(with_categories=true)
+        %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="alert alert-{{ category }}">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+    </div>
+
+
+    <!-- =================================================
+         CATEGORY BUTTONS
+    ================================================== -->
+
+    <div class="category-buttons">
+
+        <button
+            class="category-btn active"
+            onclick="filterProducts('All', this)">
+
+            All
+
+        </button>
+
+
+        <button
+            class="category-btn"
+            onclick="filterProducts('Vegetables', this)">
+
+            🥕 Vegetables
+
+        </button>
+
+
+        <button
+            class="category-btn"
+            onclick="filterProducts('Fruits', this)">
+
+            🍎 Fruits
+
+        </button>
+
+
+        <button
+            class="category-btn"
+            onclick="filterProducts('Grains', this)">
+
+            🌾 Grains
+
+        </button>
+
+
+        <button
+            class="category-btn"
+            onclick="filterProducts('Dairy', this)">
+
+            🥛 Dairy
+
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         PRODUCT GRID
+    ================================================== -->
+
+    {% if products %}
+
+    <div
+        class="product-grid"
+        id="productGrid">
+
+
+        {% for product in products %}
+
+        <div
+            class="product-card"
+            data-category="{{ product.category }}">
+
+
+            <!-- PRODUCT IMAGE -->
+
+            <img
+                class="product-image"
+                src="{{ product.image or 'https://placehold.co/800x500?text=No+Image' }}"
+                alt="{{ product.name }}"
+                onerror="this.src='https://placehold.co/800x500?text=No+Image'"
+            >
+
+
+            <div class="product-info">
+
+
+                <!-- CATEGORY -->
+
+                <div class="product-category">
+
+                    {{ product.category }}
+
+                </div>
+
+
+                <!-- NAME -->
+
+                <div class="product-name">
+
+                    {{ product.name }}
+
+                </div>
+
+
+                <!-- PRICE -->
+
+                <div class="product-price">
+
+                    ₹{{ "%.2f"|format(product.price|float) }}
+                    / {{ product.unit }}
+
+                </div>
+
+
+                <!-- FARMER -->
+
+                <div class="product-farmer">
+
+                    👨‍🌾 Farmer:
+                    {{ product.farmer }}
+
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div class="product-location">
+
+                    📍 {{ product.location }}
+
+                </div>
+
+
+                <!-- =================================================
+                     ADD TO CART FORM
+
+                     This sends product_id to Flask.
+                ================================================== -->
+
+                <form
+                    action="{{ url_for('add_to_cart') }}"
+                    method="POST"
+                    class="cart-form">
+
+
+                    <input
+                        type="hidden"
+                        name="product_id"
+                        value="{{ product.id }}"
+                    >
+
+
+                    <button
+                        type="submit"
+                        class="add-cart-btn">
+
+                        🛒 Add to Cart
+
+                    </button>
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+
+    </div>
+
+    {% else %}
+
+    <div class="no-products">
+
+        <h3>
+            🌱 No products available
+        </h3>
+
+        <p>
+            Farmers have not added any products yet.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+</section>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <p>
+        © 2026 Kisan Direct Marketplace
+    </p>
+
+    <p>
+        🌱 Fresh products directly from farmers
+    </p>
+
+</footer>
+
+
+<!-- =====================================================
+     CATEGORY FILTER JAVASCRIPT
+===================================================== -->
+
+<script>
+
+function filterProducts(category, button) {
+
+    const buttons =
+        document.querySelectorAll(".category-btn");
+
+
+    buttons.forEach(function(btn) {
+
+        btn.classList.remove("active");
+
+    });
+
+
+    button.classList.add("active");
+
+
+    const cards =
+        document.querySelectorAll(".product-card");
+
+
+    let visibleCount = 0;
+
+
+    cards.forEach(function(card) {
+
+        const productCategory =
+            card.getAttribute("data-category");
+
+
+        if (
+            category === "All" ||
+            productCategory === category
+        ) {
+
+            card.style.display = "block";
+
+            visibleCount++;
+
+        }
+
+        else {
+
+            card.style.display = "none";
+
+        }
+
+    });
+
+}
+
+</script>
+
+
+</body>
+
+</html>

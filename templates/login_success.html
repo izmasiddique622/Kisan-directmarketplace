@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login Successful - Kisan Direct Marketplace</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8f9fa;
+        }
+
+        .success-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-box {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            padding: 45px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .success-title {
+            color: #198754;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .user-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .user-type {
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .home-btn {
+            background-color: #198754;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .home-btn:hover {
+            background-color: #146c43;
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="success-container">
+
+        <div class="success-box">
+
+            <div class="success-icon">
+                ✅
+            </div>
+
+            <h1 class="success-title">
+                Login Successful!
+            </h1>
+
+            <p class="user-name">
+                Welcome, {{ name }}
+            </p>
+
+            <p class="user-type">
+                User Type: <strong>{{ user_type }}</strong>
+            </p>
+
+            <a href="/" class="home-btn">
+                🏠 Go to Home
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

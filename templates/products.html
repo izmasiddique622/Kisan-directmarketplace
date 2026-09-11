@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Products - Kisan Direct Marketplace</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f8f5;
+            color: #333;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            background: #198754;
+            color: white;
+            padding: 15px 35px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* PRODUCTS */
+
+        .products-section {
+            padding: 40px 30px;
+            min-height: 100vh;
+        }
+
+        .products-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .products-header h1 {
+            color: #176b35;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .products-header p {
+            color: #666;
+        }
+
+        /* CATEGORY BUTTONS */
+
+        .category-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .category-buttons button {
+            border: none;
+            background: #198754;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .category-buttons button:hover {
+            background: #146c43;
+        }
+
+        .category-buttons button.active {
+            background: #0d5131;
+        }
+
+        /* PRODUCT GRID */
+
+        .product-grid {
+            max-width: 1400px;
+            margin: auto;
+
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(230px, 1fr));
+
+            gap: 25px;
+        }
+
+        /* CARD */
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+
+            box-shadow:
+                0 3px 12px rgba(0,0,0,0.10);
+
+            transition: 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+
+            box-shadow:
+                0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 190px;
+
+            object-fit: cover;
+            display: block;
+
+            background: #eee;
+        }
+
+        .product-info {
+            padding: 16px;
+        }
+
+        .product-name {
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .product-category {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            color: #198754;
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .product-farmer {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .product-location {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 14px;
+        }
+
+        /* ADD TO CART */
+
+        .cart-form {
+            width: 100%;
+        }
+
+        .buy-btn {
+            width: 100%;
+
+            border: none;
+            padding: 11px;
+
+            border-radius: 7px;
+
+            background: #198754;
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .buy-btn:hover {
+            background: #146c43;
+        }
+
+        /* MESSAGE */
+
+        #cartMessage {
+            display: none;
+
+            position: fixed;
+            top: 20px;
+            right: 20px;
+
+            background: #198754;
+            color: white;
+
+            padding: 15px 22px;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 4px 15px rgba(0,0,0,0.2);
+
+            z-index: 9999;
+
+            font-weight: bold;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #176b35;
+            color: white;
+
+            text-align: center;
+
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 600px) {
+
+            .navbar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .products-section {
+                padding: 25px 15px;
+            }
+
+            .products-header h1 {
+                font-size: 27px;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        🌾 Kisan Direct Marketplace
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/">Home</a>
+
+        <a href="/buyer">
+            Products
+        </a>
+
+        <a href="/cart">
+            🛒 Cart
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- MESSAGE -->
+
+<div id="cartMessage">
+    🛒 Product added to cart!
+</div>
+
+
+<!-- PRODUCTS -->
+
+<section class="products-section">
+
+    <div class="products-header">
+
+        <h1>
+            Fresh Farm Products
+        </h1>
+
+        <p>
+            Buy fresh products directly from local farmers
+        </p>
+
+    </div>
+
+
+    <!-- CATEGORY BUTTONS -->
+
+    <div class="category-buttons">
+
+        <button
+            class="active"
+            onclick="filterProducts('All', this)">
+            All
+        </button>
+
+        <button
+            onclick="filterProducts('Vegetables', this)">
+            Vegetables
+        </button>
+
+        <button
+            onclick="filterProducts('Fruits', this)">
+            Fruits
+        </button>
+
+        <button
+            onclick="filterProducts('Grains', this)">
+            Grains
+        </button>
+
+        <button
+            onclick="filterProducts('Dairy', this)">
+            Dairy
+        </button>
+
+    </div>
+
+
+    <!-- PRODUCT GRID -->
+
+    <div
+        id="productGrid"
+        class="product-grid">
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    <p>
+        © 2026 Kisan Direct Marketplace
+    </p>
+
+    <p>
+        Fresh products directly from farmers
+    </p>
+
+</footer>
+
+
+<script>
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+const products = [
+
+    {
+        id: 1,
+        name: "Fresh Tomato",
+        category: "Vegetables",
+        price: 40,
+        unit: "kg",
+        farmer: "Ramesh Kumar",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 2,
+        name: "Fresh Potato",
+        category: "Vegetables",
+        price: 30,
+        unit: "kg",
+        farmer: "Suresh Patil",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 3,
+        name: "Red Onion",
+        category: "Vegetables",
+        price: 35,
+        unit: "kg",
+        farmer: "Amit Jadhav",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 4,
+        name: "Fresh Carrot",
+        category: "Vegetables",
+        price: 50,
+        unit: "kg",
+        farmer: "Mahesh Farm",
+        location: "Satara, Maharashtra",
+        image: "https://images.unsplash.com/photo-1445282768818-728615cc910a?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 5,
+        name: "Cauliflower",
+        category: "Vegetables",
+        price: 45,
+        unit: "kg",
+        farmer: "Ganesh Patil Farm",
+        location: "Kolhapur, Maharashtra",
+        image: "https://images.unsplash.com/photo-1568584711271-9d2f5e4b5d8e?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 6,
+        name: "Fresh Cabbage",
+        category: "Vegetables",
+        price: 35,
+        unit: "kg",
+        farmer: "Shivaji Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 7,
+        name: "Fresh Spinach",
+        category: "Vegetables",
+        price: 30,
+        unit: "bunch",
+        farmer: "Ramesh Kumar",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 8,
+        name: "Lady Finger",
+        category: "Vegetables",
+        price: 55,
+        unit: "kg",
+        farmer: "Rajesh Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1425543103986-22abb7d7ea0a?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 9,
+        name: "Brinjal",
+        category: "Vegetables",
+        price: 45,
+        unit: "kg",
+        farmer: "Village Fresh Farm",
+        location: "Satara, Maharashtra",
+        image: "https://images.unsplash.com/photo-1528826007177-f38517e2c9b0?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 10,
+        name: "Green Peas",
+        category: "Vegetables",
+        price: 80,
+        unit: "kg",
+        farmer: "Green Fields Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1587735243615-c03f25aaff15?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 11,
+        name: "Green Capsicum",
+        category: "Vegetables",
+        price: 70,
+        unit: "kg",
+        farmer: "Modern Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 12,
+        name: "Fresh Cucumber",
+        category: "Vegetables",
+        price: 40,
+        unit: "kg",
+        farmer: "Fresh Fields Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1604977042946-1eecc30f269e?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 13,
+        name: "Bitter Gourd",
+        category: "Vegetables",
+        price: 60,
+        unit: "kg",
+        farmer: "Healthy Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1603048719539-9ecb4d3b3f5d?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 14,
+        name: "Bottle Gourd",
+        category: "Vegetables",
+        price: 35,
+        unit: "kg",
+        farmer: "Kisan Green Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 15,
+        name: "Green Chilli",
+        category: "Vegetables",
+        price: 70,
+        unit: "kg",
+        farmer: "Raj Farm",
+        location: "Kolhapur, Maharashtra",
+        image: "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 16,
+        name: "Fresh Ginger",
+        category: "Vegetables",
+        price: 100,
+        unit: "kg",
+        farmer: "Ginger Valley Farm",
+        location: "Kerala",
+        image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 17,
+        name: "Fresh Garlic",
+        category: "Vegetables",
+        price: 140,
+        unit: "kg",
+        farmer: "Garlic Farm",
+        location: "Madhya Pradesh",
+        image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 18,
+        name: "Sweet Corn",
+        category: "Vegetables",
+        price: 60,
+        unit: "kg",
+        farmer: "Golden Corn Farm",
+        location: "Karnataka",
+        image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 19,
+        name: "Beetroot",
+        category: "Vegetables",
+        price: 50,
+        unit: "kg",
+        farmer: "Healthy Roots Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1593113646773-028c64a8f1b8?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 20,
+        name: "Radish",
+        category: "Vegetables",
+        price: 35,
+        unit: "kg",
+        farmer: "Fresh Roots Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1607305387299-a3d9611cd469?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 21,
+        name: "Alphonso Mango",
+        category: "Fruits",
+        price: 150,
+        unit: "kg",
+        farmer: "Mango Valley Farm",
+        location: "Ratnagiri, Maharashtra",
+        image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 22,
+        name: "Banana",
+        category: "Fruits",
+        price: 50,
+        unit: "dozen",
+        farmer: "Shree Farm",
+        location: "Jalgaon, Maharashtra",
+        image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 23,
+        name: "Apple",
+        category: "Fruits",
+        price: 180,
+        unit: "kg",
+        farmer: "Himalayan Orchard",
+        location: "Himachal Pradesh",
+        image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 24,
+        name: "Nagpur Orange",
+        category: "Fruits",
+        price: 90,
+        unit: "kg",
+        farmer: "Orange Valley Farm",
+        location: "Nagpur, Maharashtra",
+        image: "https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 25,
+        name: "Papaya",
+        category: "Fruits",
+        price: 60,
+        unit: "kg",
+        farmer: "Tropical Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 26,
+        name: "Watermelon",
+        category: "Fruits",
+        price: 35,
+        unit: "kg",
+        farmer: "Summer Fresh Farm",
+        location: "Solapur, Maharashtra",
+        image: "https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 27,
+        name: "Pomegranate",
+        category: "Fruits",
+        price: 220,
+        unit: "kg",
+        farmer: "Ruby Orchard",
+        location: "Solapur, Maharashtra",
+        image: "https://images.unsplash.com/photo-1541344999736-83eca272f6fc?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 28,
+        name: "Guava",
+        category: "Fruits",
+        price: 70,
+        unit: "kg",
+        farmer: "Green Orchard",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1536511132770-e5058c7e8c46?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 29,
+        name: "Nashik Grapes",
+        category: "Fruits",
+        price: 120,
+        unit: "kg",
+        farmer: "Nashik Grapes Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 30,
+        name: "Pineapple",
+        category: "Fruits",
+        price: 80,
+        unit: "piece",
+        farmer: "Tropical Valley Farm",
+        location: "Kerala",
+        image: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 31,
+        name: "Strawberry",
+        category: "Fruits",
+        price: 250,
+        unit: "kg",
+        farmer: "Hill View Farm",
+        location: "Mahabaleshwar, Maharashtra",
+        image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 32,
+        name: "Muskmelon",
+        category: "Fruits",
+        price: 55,
+        unit: "kg",
+        farmer: "Summer Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1571575173700-afb9492e6a50?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 33,
+        name: "Sweet Lime",
+        category: "Fruits",
+        price: 75,
+        unit: "kg",
+        farmer: "Citrus Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1582979512210-99b6a53386f9?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 34,
+        name: "Fresh Lemon",
+        category: "Fruits",
+        price: 80,
+        unit: "kg",
+        farmer: "Citrus Valley Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 35,
+        name: "Custard Apple",
+        category: "Fruits",
+        price: 100,
+        unit: "kg",
+        farmer: "Village Orchard",
+        location: "Ahmednagar, Maharashtra",
+        image: "https://images.unsplash.com/photo-1601379760883-1bb497c558a6?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 36,
+        name: "Fresh Coconut",
+        category: "Fruits",
+        price: 40,
+        unit: "piece",
+        farmer: "Coastal Farm",
+        location: "Kerala",
+        image: "https://images.unsplash.com/photo-1550828520-4cb496926fc9?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 37,
+        name: "Basmati Rice",
+        category: "Grains",
+        price: 110,
+        unit: "kg",
+        farmer: "Punjab Grain Farm",
+        location: "Punjab",
+        image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 38,
+        name: "Brown Rice",
+        category: "Grains",
+        price: 95,
+        unit: "kg",
+        farmer: "Healthy Grain Farm",
+        location: "Haryana",
+        image: "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 39,
+        name: "Wheat",
+        category: "Grains",
+        price: 45,
+        unit: "kg",
+        farmer: "Punjab Farm",
+        location: "Punjab",
+        image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 40,
+        name: "Maize",
+        category: "Grains",
+        price: 35,
+        unit: "kg",
+        farmer: "Golden Fields Farm",
+        location: "Karnataka",
+        image: "https://images.unsplash.com/photo-1601593768795-1c9b3f6c7c4e?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 41,
+        name: "Pearl Millet",
+        category: "Grains",
+        price: 60,
+        unit: "kg",
+        farmer: "Natural Millet Farm",
+        location: "Rajasthan",
+        image: "https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 42,
+        name: "Finger Millet (Ragi)",
+        category: "Grains",
+        price: 75,
+        unit: "kg",
+        farmer: "Healthy Millet Farm",
+        location: "Karnataka",
+        image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 43,
+        name: "Sorghum (Jowar)",
+        category: "Grains",
+        price: 55,
+        unit: "kg",
+        farmer: "Deccan Farm",
+        location: "Maharashtra",
+        image: "https://images.unsplash.com/photo-1603048719539-9ecb4d3b3f5d?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 44,
+        name: "Barley",
+        category: "Grains",
+        price: 65,
+        unit: "kg",
+        farmer: "Green Grain Farm",
+        location: "Haryana",
+        image: "https://images.unsplash.com/photo-1551462147-ff29053bfc14?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 45,
+        name: "Toor Dal",
+        category: "Grains",
+        price: 140,
+        unit: "kg",
+        farmer: "Dal Farmers Group",
+        location: "Maharashtra",
+        image: "https://images.unsplash.com/photo-1585998377907-4e8d1c1d1b0d?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 46,
+        name: "Moong Dal",
+        category: "Grains",
+        price: 130,
+        unit: "kg",
+        farmer: "Green Pulse Farm",
+        location: "Maharashtra",
+        image: "https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 47,
+        name: "Masoor Dal",
+        category: "Grains",
+        price: 115,
+        unit: "kg",
+        farmer: "Red Lentil Farm",
+        location: "Madhya Pradesh",
+        image: "https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 48,
+        name: "Chana Dal",
+        category: "Grains",
+        price: 90,
+        unit: "kg",
+        farmer: "Chana Farm",
+        location: "Maharashtra",
+        image: "https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 49,
+        name: "Groundnut",
+        category: "Grains",
+        price: 110,
+        unit: "kg",
+        farmer: "Groundnut Farm",
+        location: "Gujarat",
+        image: "https://images.unsplash.com/photo-1567892737950-30c4db37cd89?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 50,
+        name: "Mustard Seeds",
+        category: "Grains",
+        price: 85,
+        unit: "kg",
+        farmer: "Mustard Valley Farm",
+        location: "Rajasthan",
+        image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 51,
+        name: "Fresh Cow Milk",
+        category: "Dairy",
+        price: 60,
+        unit: "litre",
+        farmer: "Ramesh Kumar",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 52,
+        name: "Fresh Buffalo Milk",
+        category: "Dairy",
+        price: 70,
+        unit: "litre",
+        farmer: "Shree Dairy Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 53,
+        name: "Fresh Curd",
+        category: "Dairy",
+        price: 80,
+        unit: "kg",
+        farmer: "Village Dairy Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 54,
+        name: "Fresh Paneer",
+        category: "Dairy",
+        price: 320,
+        unit: "kg",
+        farmer: "Pure Dairy Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 55,
+        name: "Desi Cow Ghee",
+        category: "Dairy",
+        price: 650,
+        unit: "kg",
+        farmer: "Organic Dairy Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 56,
+        name: "Fresh Butter",
+        category: "Dairy",
+        price: 450,
+        unit: "kg",
+        farmer: "Green Dairy Farm",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 57,
+        name: "Fresh Buttermilk",
+        category: "Dairy",
+        price: 40,
+        unit: "litre",
+        farmer: "Village Milk Farm",
+        location: "Kolhapur, Maharashtra",
+        image: "https://images.unsplash.com/photo-1553787499-6f0a9e1c9f7d?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 58,
+        name: "Fresh Cheese",
+        category: "Dairy",
+        price: 350,
+        unit: "kg",
+        farmer: "Farm Fresh Dairy",
+        location: "Pune, Maharashtra",
+        image: "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 59,
+        name: "Fresh Cream",
+        category: "Dairy",
+        price: 280,
+        unit: "kg",
+        farmer: "Pure Milk Farm",
+        location: "Nashik, Maharashtra",
+        image: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=800&q=80"
+    },
+
+    {
+        id: 60,
+        name: "Organic Milk",
+        category: "Dairy",
+        price: 75,
+        unit: "litre",
+        farmer: "Organic Cow Farm",
+        location: "Satara, Maharashtra",
+        image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=800&q=80"
+    }
+
+];
+
+
+/* =========================================================
+   DISPLAY PRODUCTS
+========================================================= */
+
+function displayProducts(productList) {
+
+    const productGrid =
+        document.getElementById("productGrid");
+
+    productGrid.innerHTML = "";
+
+
+    if (productList.length === 0) {
+
+        productGrid.innerHTML = `
+            <div style="
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 50px;
+            ">
+                <h2>No products found</h2>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    productList.forEach(function(product) {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "product-card";
+
+
+        card.innerHTML = `
+
+            <img
+                src="${product.image}"
+                alt="${product.name}"
+                loading="lazy"
+                onerror="
+                    this.onerror=null;
+                    this.src='https://placehold.co/800x500?text=No+Image';
+                "
+            >
+
+            <div class="product-info">
+
+                <div class="product-name">
+                    ${product.name}
+                </div>
+
+                <div class="product-category">
+                    ${product.category}
+                </div>
+
+                <div class="product-price">
+                    ₹${product.price} / ${product.unit}
+                </div>
+
+                <div class="product-farmer">
+                    👨‍🌾 Farmer: ${product.farmer}
+                </div>
+
+                <div class="product-location">
+                    📍 ${product.location}
+                </div>
+
+
+                <form
+                    class="cart-form"
+                    action="/add-to-cart"
+                    method="POST"
+                    onsubmit="return addToCart(this)"
+                >
+
+                    <input
+                        type="hidden"
+                        name="product_id"
+                        value="${product.id}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="product_name"
+                        value="${product.name}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="price"
+                        value="${product.price}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="unit"
+                        value="${product.unit}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="farmer"
+                        value="${product.farmer}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="location"
+                        value="${product.location}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="image"
+                        value="${product.image}"
+                    >
+
+                    <button
+                        type="submit"
+                        class="buy-btn"
+                    >
+                        🛒 Add to Cart
+                    </button>
+
+                </form>
+
+            </div>
+        `;
+
+
+        productGrid.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+   ADD TO CART
+========================================================= */
+
+function addToCart(form) {
+
+    const formData =
+        new FormData(form);
+
+
+    fetch("/add-to-cart", {
+
+        method: "POST",
+
+        body: formData
+
+    })
+
+    .then(function(response) {
+
+        if (response.redirected) {
+
+            window.location.href =
+                response.url;
+
+            return;
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to add product"
+            );
+        }
+
+
+        return response.text();
+
+    })
+
+    .then(function() {
+
+        showCartMessage();
+
+    })
+
+    .catch(function(error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to add product to cart. Please login again."
+        );
+
+    });
+
+
+    return false;
+}
+
+
+/* =========================================================
+   CART MESSAGE
+========================================================= */
+
+function showCartMessage() {
+
+    const message =
+        document.getElementById("cartMessage");
+
+
+    message.style.display = "block";
+
+
+    setTimeout(function() {
+
+        message.style.display = "none";
+
+    }, 2000);
+
+}
+
+
+/* =========================================================
+   CATEGORY FILTER
+========================================================= */
+
+function filterProducts(category, button) {
+
+    document
+        .querySelectorAll(
+            ".category-buttons button"
+        )
+        .forEach(function(btn) {
+
+            btn.classList.remove("active");
+
+        });
+
+
+    if (button) {
+
+        button.classList.add("active");
+
+    }
+
+
+    if (category === "All") {
+
+        displayProducts(products);
+
+    } else {
+
+        const filteredProducts =
+            products.filter(function(product) {
+
+                return product.category === category;
+
+            });
+
+
+        displayProducts(filteredProducts);
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD PRODUCTS
+========================================================= */
+
+displayProducts(products);
+
+</script>
+
+</body>
+</html>
