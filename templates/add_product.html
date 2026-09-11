@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Product - Kisan Direct Marketplace</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f8f5;
+            color: #222;
+        }
+
+        .navbar {
+            background: #198754;
+            color: white;
+            padding: 15px 35px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .form-box {
+            background: white;
+            padding: 30px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #176b35;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+            color: #333;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #ccc;
+            border-radius: 7px;
+
+            font-size: 15px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #198754;
+        }
+
+        .submit-btn {
+            width: 100%;
+
+            border: none;
+
+            background: #198754;
+            color: white;
+
+            padding: 13px;
+
+            border-radius: 7px;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #146c43;
+        }
+
+        .back-btn {
+            display: block;
+
+            text-align: center;
+
+            margin-top: 15px;
+
+            color: #198754;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 40px;
+
+            background: #176b35;
+            color: white;
+
+            text-align: center;
+
+            padding: 20px;
+        }
+
+        @media(max-width: 700px) {
+
+            .navbar {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        🌾 Kisan Direct Marketplace
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/farmer">
+            Dashboard
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- FORM -->
+
+<div class="container">
+
+    <div class="form-box">
+
+        <h1>
+            ➕ Add New Product
+        </h1>
+
+        <p class="subtitle">
+            Add your farm product to the marketplace
+        </p>
+
+
+        <!-- IMPORTANT: CORRECT ROUTE -->
+
+        <form
+            method="POST"
+            action="/add-product"
+        >
+
+
+            <!-- PRODUCT NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Product Name
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Example: Fresh Tomatoes"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label>
+                    Category
+                </label>
+
+                <select name="category" required>
+
+                    <option value="">
+                        Select Category
+                    </option>
+
+                    <option value="Fruits">
+                        🍎 Fruits
+                    </option>
+
+                    <option value="Vegetables">
+                        🥕 Vegetables
+                    </option>
+
+                    <option value="Grains">
+                        🌾 Grains
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PRICE -->
+
+            <div class="form-group">
+
+                <label>
+                    Price
+                </label>
+
+                <input
+                    type="number"
+                    name="price"
+                    step="0.01"
+                    min="0"
+                    placeholder="Example: 50"
+                    required
+                >
+
+            </div>
+
+
+            <!-- UNIT -->
+
+            <div class="form-group">
+
+                <label>
+                    Unit
+                </label>
+
+                <select name="unit" required>
+
+                    <option value="">
+                        Select Unit
+                    </option>
+
+                    <option value="kg">
+                        Kilogram (kg)
+                    </option>
+
+                    <option value="quintal">
+                        Quintal
+                    </option>
+
+                    <option value="piece">
+                        Piece
+                    </option>
+
+                    <option value="dozen">
+                        Dozen
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- LOCATION -->
+
+            <div class="form-group">
+
+                <label>
+                    Farm Location
+                </label>
+
+                <input
+                    type="text"
+                    name="location"
+                    placeholder="Example: Nashik, Maharashtra"
+                    required
+                >
+
+            </div>
+
+
+            <!-- IMAGE -->
+
+            <div class="form-group">
+
+                <label>
+                    Product Image URL
+                </label>
+
+                <input
+                    type="url"
+                    name="image"
+                    placeholder="https://example.com/image.jpg"
+                >
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="submit-btn"
+            >
+                🌱 Add Product
+            </button>
+
+
+        </form>
+
+
+        <a
+            href="/farmer"
+            class="back-btn"
+        >
+            ← Back to Farmer Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    <p>
+        © 2026 Kisan Direct Marketplace
+    </p>
+
+    <p>
+        🌱 Fresh products directly from farmers
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>
