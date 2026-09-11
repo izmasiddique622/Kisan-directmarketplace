@@ -88,13 +88,15 @@ def get_db_connection():
 
     return mysql.connector.connect(
 
-        host="localhost",
+        host=os.getenv("MYSQL_HOST", "localhost"),
 
-        user="root",
+        port=int(os.getenv("MYSQL_PORT", "3306")),
+
+        user=os.getenv("MYSQL_USER", "root"),
 
         password=os.getenv("MYSQL_PASSWORD", ""),
 
-        database="kisan_direct_marketplace"
+        database=os.getenv("MYSQL_DATABASE", "kisan_direct_marketplace")
     )
 
 
@@ -2800,7 +2802,7 @@ def contact():
 if __name__ == "__main__":
 
     app.run(
-        debug=True,
-        host="127.0.0.1",
-        port=5000
+        debug=False,
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", "5000"))
     )
