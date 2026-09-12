@@ -93,37 +93,12 @@ def send_email(to_email, subject, message):
 # =========================================================
 
 def get_db_connection():
-
     return mysql.connector.connect(
-
-        host=os.getenv(
-            "MYSQL_HOST",
-            "localhost"
-        ),
-
-        port=int(
-            os.getenv(
-                "MYSQL_PORT",
-                "3306"
-            )
-        ),
-
-        user=os.getenv(
-            "MYSQL_USER",
-            "root"
-        ),
-
-        password=os.getenv(
-            "MYSQL_PASSWORD",
-            ""
-        ),
-
-        database=os.getenv(
-            "MYSQL_DATABASE",
-            "kisan_direct_marketplace"
-        )
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
     )
-
 
 # =========================================================
 # PASSWORD HASH
