@@ -1,21 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
 from mysql.connector import Error
-
-import resend
-import os
 import hashlib
+import smtplib
+import os
 from dotenv import load_dotenv
+from email.message import EmailMessage
 
 load_dotenv()
-
-# =========================================================
-# EMAIL CONFIGURATION
-# =========================================================
-
-RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
-RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "")
-RESEND_ADMIN_EMAIL = os.getenv("RESEND_ADMIN_EMAIL", "")
 
 
 # =========================================================
@@ -31,57 +23,48 @@ app.secret_key = os.getenv(
 
 
 # =========================================================
-# SEND EMAIL USING RESEND
+# EMAIL CONFIGURATION
+# =========================================================
+
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS", "")
+EMAIL_APP_PASSWORD = os.getenv("EMAIL_APP_PASSWORD", "")
+
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 465
+
+
+# =========================================================
+# SEND EMAIL
 # =========================================================
 
 def send_email(to_email, subject, message):
-
     try:
-
-        if (
-            not to_email
-            or not RESEND_API_KEY
-            or not RESEND_FROM_EMAIL
-        ):
-
-            print("RESEND EMAIL NOT CONFIGURED")
-
+        if not to_email or not EMAIL_ADDRESS or not EMAIL_APP_PASSWORD:
+            print("EMAIL NOT CONFIGURED")
             return False
 
-        resend.api_key = RESEND_API_KEY
+        email = EmailMessage()
+        email["From"] = EMAIL_ADDRESS
+        email["To"] = to_email
+        email["Subject"] = subject
+        email.set_content(message)
 
-        params = {
+        with smtplib.SMTP_SSL(
+            SMTP_SERVER,
+            SMTP_PORT,
+            timeout=8
+        ) as server:
+            server.login(
+                EMAIL_ADDRESS,
+                EMAIL_APP_PASSWORD
+            )
+            server.send_message(email)
 
-            "from": RESEND_FROM_EMAIL,
-
-            "to": [to_email],
-
-            "subject": subject,
-
-            "text": message
-        }
-
-        email = resend.Emails.send(params)
-
-        print(
-            "EMAIL SENT SUCCESSFULLY TO:",
-            to_email
-        )
-
-        print(
-            "RESEND RESPONSE:",
-            email
-        )
-
+        print("EMAIL SENT SUCCESSFULLY TO:", to_email)
         return True
 
     except Exception as e:
-
-        print(
-            "RESEND EMAIL ERROR:",
-            e
-        )
-
+        print("EMAIL ERROR:", e)
         return False
 
 
@@ -90,34 +73,16 @@ def send_email(to_email, subject, message):
 # =========================================================
 
 def get_db_connection():
-
     return mysql.connector.connect(
-
         host=os.getenv("DB_HOST"),
-
-        port=int(
-            os.getenv(
-                "DB_PORT",
-                "3306"
-            )
-        ),
-
+        port=int(os.getenv("DB_PORT", "3306")),
         user=os.getenv("DB_USER"),
-
         password=os.getenv("DB_PASSWORD"),
-
         database=os.getenv("DB_NAME"),
-
-        ssl_ca=os.path.join(
-            os.path.dirname(__file__),
-            "ca.pem"
-        ),
-
+        ssl_ca=os.path.join(os.path.dirname(__file__), "ca.pem"),
         ssl_disabled=False,
-
         connection_timeout=10
     )
-
 
 # =========================================================
 # PASSWORD HASH
@@ -274,11 +239,9 @@ def login():
         finally:
 
             if cursor:
-
                 cursor.close()
 
             if db:
-
                 db.close()
 
     return render_template(
@@ -407,11 +370,9 @@ def farmer_login():
         finally:
 
             if cursor:
-
                 cursor.close()
 
             if db:
-
                 db.close()
 
     return render_template(
@@ -498,11 +459,9 @@ def buyer():
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -699,11 +658,9 @@ def farmer():
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -930,7 +887,6 @@ def update_order_status(order_id):
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -951,11 +907,9 @@ def update_order_status(order_id):
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -1168,7 +1122,6 @@ def add_product():
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -1189,11 +1142,9 @@ def add_product():
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -1242,6 +1193,10 @@ def edit_product(product_id):
             dictionary=True
         )
 
+        # =================================================
+        # GET PRODUCT
+        # =================================================
+
         cursor.execute("""
 
             SELECT
@@ -1278,12 +1233,20 @@ def edit_product(product_id):
                 url_for("farmer")
             )
 
+        # =================================================
+        # SHOW EDIT FORM
+        # =================================================
+
         if request.method == "GET":
 
             return render_template(
                 "edit_product.html",
                 product=product
             )
+
+        # =================================================
+        # GET FORM DATA
+        # =================================================
 
         name = request.form.get(
             "name",
@@ -1314,6 +1277,10 @@ def edit_product(product_id):
             "image",
             ""
         ).strip()
+
+        # =================================================
+        # VALIDATION
+        # =================================================
 
         if not name:
 
@@ -1391,6 +1358,10 @@ def edit_product(product_id):
                 product=product
             )
 
+        # =================================================
+        # UPDATE PRODUCT
+        # =================================================
+
         cursor.execute("""
 
             UPDATE products
@@ -1432,7 +1403,6 @@ def edit_product(product_id):
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -1453,11 +1423,9 @@ def edit_product(product_id):
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -1536,7 +1504,6 @@ def delete_product(product_id):
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -1552,11 +1519,9 @@ def delete_product(product_id):
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
     return redirect(
@@ -1774,7 +1739,6 @@ def add_to_cart():
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -1795,11 +1759,9 @@ def add_to_cart():
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -1914,11 +1876,9 @@ def cart():
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -1972,7 +1932,6 @@ def increase_cart(cart_id):
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -1983,11 +1942,9 @@ def increase_cart(cart_id):
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
     return redirect(
@@ -2089,7 +2046,6 @@ def decrease_cart(cart_id):
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -2100,11 +2056,9 @@ def decrease_cart(cart_id):
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
     return redirect(
@@ -2165,7 +2119,6 @@ def remove_from_cart(cart_id):
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -2181,11 +2134,9 @@ def remove_from_cart(cart_id):
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
     return redirect(
@@ -2241,7 +2192,6 @@ def clear_cart():
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -2252,11 +2202,9 @@ def clear_cart():
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
     return redirect(
@@ -2355,11 +2303,9 @@ def checkout():
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -2386,6 +2332,10 @@ def place_order():
         )
 
     user_id = session["user_id"]
+
+    # =====================================================
+    # CHECKOUT DETAILS
+    # =====================================================
 
     customer_name = request.form.get(
         "customer_name",
@@ -2815,7 +2765,6 @@ def place_order():
     except Error as e:
 
         if db:
-
             db.rollback()
 
         print(
@@ -2836,11 +2785,9 @@ def place_order():
     finally:
 
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
 
 
@@ -2923,12 +2870,117 @@ def orders():
         # GET ORDER ITEMS
         # =================================================
 
-        for order in orders_list:
+        @app.route("/place-order", methods=["POST"])
+def place_order():
+    db = None
+    cursor = None
 
+    try:
+        # Get buyer details
+        customer_name = request.form.get("customer_name", "").strip()
+        email = request.form.get("email", "").strip()
+        phone = request.form.get("phone", "").strip()
+        pincode = request.form.get("pincode", "").strip()
+        house = request.form.get("house", "").strip()
+        address = request.form.get("address", "").strip()
+        city = request.form.get("city", "").strip()
+        state = request.form.get("state", "").strip()
+
+        # Validation
+        if not customer_name:
+            flash("Please enter your name.", "danger")
+            return redirect(url_for("checkout"))
+
+        if not email:
+            flash("Please enter your email.", "danger")
+            return redirect(url_for("checkout"))
+
+        if not phone:
+            flash("Please enter your phone number.", "danger")
+            return redirect(url_for("checkout"))
+
+        if not pincode:
+            flash("Please enter your pincode.", "danger")
+            return redirect(url_for("checkout"))
+
+        if not house:
+            flash("Please enter house/building details.", "danger")
+            return redirect(url_for("checkout"))
+
+        if not address:
+            flash("Please enter your address.", "danger")
+            return redirect(url_for("checkout"))
+
+        if not city:
+            flash("Please enter your city.", "danger")
+            return redirect(url_for("checkout"))
+
+        if not state:
+            flash("Please enter your state.", "danger")
+            return redirect(url_for("checkout"))
+
+        # Database connection
+        db = get_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        # Get buyer cart
+        cursor.execute("""
+            SELECT *
+            FROM cart
+            WHERE user_id = %s
+        """, (session["user_id"],))
+
+        cart_items = cursor.fetchall()
+
+        if not cart_items:
+            flash("Your cart is empty.", "warning")
+            return redirect(url_for("cart"))
+
+        # Calculate total
+        total = 0
+
+        for item in cart_items:
+            total += float(item["price"]) * int(item["quantity"])
+
+        # Complete address
+        full_address = (
+            f"{house}, {address}, "
+            f"{city}, {state} - {pincode}"
+        )
+
+        # Create order
+        cursor.execute("""
+            INSERT INTO orders
+            (
+                user_id,
+                customer_name,
+                email,
+                phone,
+                address,
+                total,
+                status,
+                delivery_status
+            )
+            VALUES
+            (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            session["user_id"],
+            customer_name,
+            email,
+            phone,
+            full_address,
+            total,
+            "Pending",
+            "Order Placed"
+        ))
+
+        order_id = cursor.lastrowid
+
+        # Save order items
+        for item in cart_items:
             cursor.execute("""
-
-                SELECT
-                    id,
+                INSERT INTO order_items
+                (
                     order_id,
                     product_id,
                     product_name,
@@ -2938,46 +2990,110 @@ def orders():
                     farmer,
                     location,
                     image
-
-                FROM order_items
-
-                WHERE order_id = %s
-
-                ORDER BY id ASC
-
+                )
+                VALUES
+                (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
-                order["id"],
+                order_id,
+                item["product_id"],
+                item["product_name"],
+                item["price"],
+                item["unit"],
+                item["quantity"],
+                item["farmer"],
+                item["location"],
+                item["image"]
             ))
 
-            order["items"] = cursor.fetchall()
+        # Clear cart
+        cursor.execute("""
+            DELETE FROM cart
+            WHERE user_id = %s
+        """, (session["user_id"],))
 
-        return render_template(
-            "orders.html",
-            orders=orders_list
+        # IMPORTANT:
+        # Save order BEFORE sending email
+        db.commit()
+
+        # Send confirmation email
+        email_subject = f"Order Confirmation - Kisan Direct Marketplace"
+
+        email_message = f"""
+Hello {customer_name},
+
+Thank you for placing your order on Kisan Direct Marketplace.
+
+Your order has been successfully placed.
+
+Order ID: #{order_id}
+Customer Name: {customer_name}
+Phone: {phone}
+Address: {full_address}
+
+Total Amount: ₹{total:.2f}
+
+Order Status: Pending
+
+You can check your order status from the Orders section of our website.
+
+Thank you for shopping with Kisan Direct Marketplace.
+
+Regards,
+Kisan Direct Marketplace
+"""
+
+        # Email failure should NOT cancel the order
+        email_sent = send_email(
+            email,
+            email_subject,
+            email_message
         )
 
-    except Error as e:
+        if email_sent:
+            flash(
+                "Order placed successfully! Confirmation email sent to your email.",
+                "success"
+            )
+        else:
+            flash(
+                "Order placed successfully! We could not send the confirmation email right now.",
+                "warning"
+            )
 
-        print(
-            "ORDERS ERROR:",
-            e
+        return redirect(url_for("orders"))
+
+    except mysql.connector.Error as e:
+        if db:
+            db.rollback()
+
+        print("Database error while placing order:", e)
+
+        flash(
+            "Something went wrong while placing your order. Please try again.",
+            "danger"
         )
 
-        return (
-            "Database error: "
-            + str(e)
+        return redirect(url_for("checkout"))
+
+    except Exception as e:
+        if db:
+            db.rollback()
+
+        print("Unexpected error while placing order:", e)
+
+        flash(
+            "Something went wrong. Please try again.",
+            "danger"
         )
+
+        return redirect(url_for("checkout"))
 
     finally:
-
         if cursor:
-
             cursor.close()
 
         if db:
-
             db.close()
-
 
 # =========================================================
 # CONTACT US
@@ -3089,7 +3205,7 @@ def contact():
         # =================================================
 
         email_sent = send_email(
-            RESEND_ADMIN_EMAIL,
+            EMAIL_ADDRESS,
             email_subject,
             email_message
         )
