@@ -5,7 +5,17 @@ import hashlib
 import os
 from dotenv import load_dotenv
 
+
+# =========================================================
+# LOAD ENVIRONMENT VARIABLES
+# =========================================================
+
 load_dotenv()
+
+
+# =========================================================
+# FLASK APP
+# =========================================================
 
 app = Flask(__name__)
 
@@ -20,13 +30,17 @@ app.secret_key = os.getenv(
 # =========================================================
 
 def get_db_connection():
+
     return mysql.connector.connect(
         host=os.getenv("DB_HOST"),
         port=int(os.getenv("DB_PORT", "3306")),
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME"),
-        ssl_ca=os.path.join(os.path.dirname(__file__), "ca.pem"),
+        ssl_ca=os.path.join(
+            os.path.dirname(__file__),
+            "ca.pem"
+        ),
         ssl_disabled=False,
         connection_timeout=10
     )
@@ -37,7 +51,10 @@ def get_db_connection():
 # =========================================================
 
 def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+
+    return hashlib.sha256(
+        password.encode()
+    ).hexdigest()
 
 
 # =========================================================
@@ -46,11 +63,12 @@ def hash_password(password):
 
 @app.route("/")
 def home():
+
     return render_template("index.html")
 
 
 # =========================================================
-# LOGIN
+# BUYER / COMMON LOGIN
 # =========================================================
 
 @app.route("/login", methods=["GET", "POST"])
@@ -58,29 +76,51 @@ def login():
 
     if request.method == "POST":
 
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "")
+        email = request.form.get(
+            "email",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
 
         if not email or not password:
-            flash("Please enter email and password.", "danger")
+
+            flash(
+                "Please enter email and password.",
+                "danger"
+            )
+
             return redirect(url_for("login"))
 
         conn = None
         cursor = None
 
         try:
-            conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True)
 
-            password_hash = hash_password(password)
+            conn = get_db_connection()
+
+            cursor = conn.cursor(
+                dictionary=True
+            )
+
+            password_hash = hash_password(
+                password
+            )
 
             cursor.execute(
                 """
                 SELECT *
                 FROM users
-                WHERE email = %s AND password = %s
+                WHERE email = %s
+                AND password = %s
                 """,
-                (email, password_hash)
+                (
+                    email,
+                    password_hash
+                )
             )
 
             user = cursor.fetchone()
@@ -88,61 +128,123 @@ def login():
             if user:
 
                 session["user_id"] = user["id"]
-                session["user_name"] = user.get("name", "")
-                session["user_email"] = user.get("email", "")
-                session["role"] = user.get("role", "buyer")
 
-                role = user.get("role", "buyer")
+                session["user_name"] = user.get(
+                    "name",
+                    ""
+                )
 
-                flash("Login successful!", "success")
+                session["user_email"] = user.get(
+                    "email",
+                    ""
+                )
+
+                session["role"] = user.get(
+                    "role",
+                    "buyer"
+                )
+
+                role = user.get(
+                    "role",
+                    "buyer"
+                )
+
+                flash(
+                    "Login successful!",
+                    "success"
+                )
 
                 if role == "farmer":
-                    return redirect(url_for("farmer"))
 
-                return redirect(url_for("buyer"))
+                    return redirect(
+                        url_for("farmer")
+                    )
 
-            flash("Invalid email or password.", "danger")
+                return redirect(
+                    url_for("buyer")
+                )
+
+            flash(
+                "Invalid email or password.",
+                "danger"
+            )
 
         except Error as e:
-            print("LOGIN ERROR:", e)
-            flash("Unable to connect to database.", "danger")
+
+            print(
+                "LOGIN ERROR:",
+                e
+            )
+
+            flash(
+                "Unable to connect to database.",
+                "danger"
+            )
 
         finally:
+
             if cursor:
                 cursor.close()
 
             if conn:
                 conn.close()
 
-        return redirect(url_for("login"))
+        return redirect(
+            url_for("login")
+        )
 
-    return render_template("login.html")
+    return render_template(
+        "login.html"
+    )
 
 
 # =========================================================
 # FARMER LOGIN
 # =========================================================
 
-@app.route("/farmer-login", methods=["GET", "POST"])
+@app.route(
+    "/farmer-login",
+    methods=["GET", "POST"]
+)
 def farmer_login():
 
     if request.method == "POST":
 
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "")
+        email = request.form.get(
+            "email",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
 
         if not email or not password:
-            flash("Please enter email and password.", "danger")
-            return redirect(url_for("farmer_login"))
+
+            flash(
+                "Please enter email and password.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("farmer_login")
+            )
 
         conn = None
         cursor = None
 
         try:
-            conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True)
 
-            password_hash = hash_password(password)
+            conn = get_db_connection()
+
+            cursor = conn.cursor(
+                dictionary=True
+            )
+
+            password_hash = hash_password(
+                password
+            )
 
             cursor.execute(
                 """
@@ -152,37 +254,75 @@ def farmer_login():
                 AND password = %s
                 AND role = 'farmer'
                 """,
-                (email, password_hash)
+                (
+                    email,
+                    password_hash
+                )
             )
 
             user = cursor.fetchone()
 
             if user:
+
                 session["user_id"] = user["id"]
-                session["user_name"] = user.get("name", "")
-                session["user_email"] = user.get("email", "")
+
+                session["user_name"] = user.get(
+                    "name",
+                    ""
+                )
+
+                session["user_email"] = user.get(
+                    "email",
+                    ""
+                )
+
                 session["role"] = "farmer"
 
-                flash("Farmer login successful!", "success")
+                flash(
+                    "Farmer login successful!",
+                    "success"
+                )
 
-                return redirect(url_for("farmer"))
+                return redirect(
+                    url_for("farmer")
+                )
 
-            flash("Invalid farmer email or password.", "danger")
+            flash(
+                "Invalid farmer email or password.",
+                "danger"
+            )
 
         except Error as e:
-            print("FARMER LOGIN ERROR:", e)
-            flash("Unable to connect to database.", "danger")
+
+            print(
+                "FARMER LOGIN ERROR:",
+                e
+            )
+
+            flash(
+                "Unable to connect to database.",
+                "danger"
+            )
 
         finally:
+
             if cursor:
                 cursor.close()
 
             if conn:
                 conn.close()
 
-        return redirect(url_for("farmer_login"))
+        return redirect(
+            url_for("farmer_login")
+        )
 
-    return render_template("farmer_login.html")
+    # IMPORTANT:
+    # Actual template name is farmer_login.html
+
+    return render_template(
+        "farmer_login.html"
+    )
+
 
 # =========================================================
 # LOGOUT
@@ -193,9 +333,14 @@ def logout():
 
     session.clear()
 
-    flash("You have been logged out.", "success")
+    flash(
+        "You have been logged out.",
+        "success"
+    )
 
-    return redirect(url_for("home"))
+    return redirect(
+        url_for("home")
+    )
 
 
 # =========================================================
@@ -206,8 +351,23 @@ def logout():
 def buyer():
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    # Farmer should not access buyer dashboard
+
+    if session.get("role") == "farmer":
+
+        return redirect(
+            url_for("farmer")
+        )
 
     conn = None
     cursor = None
@@ -217,7 +377,10 @@ def buyer():
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+
+        cursor = conn.cursor(
+            dictionary=True
+        )
 
         cursor.execute(
             """
@@ -231,9 +394,15 @@ def buyer():
 
     except Error as e:
 
-        print("BUYER ERROR:", e)
+        print(
+            "BUYER ERROR:",
+            e
+        )
 
-        flash("Unable to load products.", "danger")
+        flash(
+            "Unable to load products.",
+            "danger"
+        )
 
     finally:
 
@@ -257,12 +426,26 @@ def buyer():
 def farmer():
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer_login")
+        )
 
     if session.get("role") != "farmer":
-        flash("Farmer access required.", "danger")
-        return redirect(url_for("buyer"))
+
+        flash(
+            "Farmer access required.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("buyer")
+        )
 
     conn = None
     cursor = None
@@ -273,9 +456,15 @@ def farmer():
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
 
-        # Farmer's products
+        cursor = conn.cursor(
+            dictionary=True
+        )
+
+        # -------------------------------------------------
+        # FARMER PRODUCTS
+        # -------------------------------------------------
+
         cursor.execute(
             """
             SELECT *
@@ -283,12 +472,17 @@ def farmer():
             WHERE farmer_id = %s
             ORDER BY id DESC
             """,
-            (session["user_id"],)
+            (
+                session["user_id"],
+            )
         )
 
         products = cursor.fetchall()
 
-        # Farmer's orders
+        # -------------------------------------------------
+        # FARMER ORDERS
+        # -------------------------------------------------
+
         cursor.execute(
             """
             SELECT DISTINCT
@@ -306,16 +500,27 @@ def farmer():
             WHERE oi.farmer = %s
             ORDER BY o.id DESC
             """,
-            (session.get("user_name", ""),)
+            (
+                session.get(
+                    "user_name",
+                    ""
+                ),
+            )
         )
 
         orders_list = cursor.fetchall()
 
     except Error as e:
 
-        print("FARMER DASHBOARD ERROR:", e)
+        print(
+            "FARMER DASHBOARD ERROR:",
+            e
+        )
 
-        flash("Unable to load farmer dashboard.", "danger")
+        flash(
+            "Unable to load farmer dashboard.",
+            "danger"
+        )
 
     finally:
 
@@ -336,32 +541,141 @@ def farmer():
 # ADD PRODUCT
 # =========================================================
 
-@app.route("/farmer/add-product", methods=["GET", "POST"])
-@app.route("/add-product", methods=["GET", "POST"])
+@app.route(
+    "/farmer/add-product",
+    methods=["GET", "POST"]
+)
+@app.route(
+    "/add-product",
+    methods=["GET", "POST"]
+)
 def add_product():
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer_login")
+        )
 
     if session.get("role") != "farmer":
-        flash("Only farmers can add products.", "danger")
-        return redirect(url_for("buyer"))
+
+        flash(
+            "Only farmers can add products.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("buyer")
+        )
 
     if request.method == "POST":
 
-        name = request.form.get("name", "").strip()
-        category = request.form.get("category", "").strip()
-        price = request.form.get("price", "0").strip()
-        unit = request.form.get("unit", "").strip()
-        location = request.form.get("location", "").strip()
-        image = request.form.get("image", "").strip()
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
 
-        farmer_name = session.get("user_name", "")
+        category = request.form.get(
+            "category",
+            ""
+        ).strip()
 
-        if not name or not category or not price or not unit:
-            flash("Please fill all required product details.", "danger")
-            return redirect(url_for("add_product"))
+        price = request.form.get(
+            "price",
+            ""
+        ).strip()
+
+        unit = request.form.get(
+            "unit",
+            ""
+        ).strip()
+
+        location = request.form.get(
+            "location",
+            ""
+        ).strip()
+
+        image = request.form.get(
+            "image",
+            ""
+        ).strip()
+
+        farmer_name = session.get(
+            "user_name",
+            ""
+        )
+
+        # -------------------------------------------------
+        # VALIDATION
+        # -------------------------------------------------
+
+        if not name:
+
+            flash(
+                "Product name is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("add_product")
+            )
+
+        if not category:
+
+            flash(
+                "Product category is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("add_product")
+            )
+
+        if not price:
+
+            flash(
+                "Product price is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("add_product")
+            )
+
+        if not unit:
+
+            flash(
+                "Product unit is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("add_product")
+            )
+
+        try:
+
+            price_value = float(price)
+
+            if price_value < 0:
+
+                raise ValueError
+
+        except ValueError:
+
+            flash(
+                "Please enter a valid price.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("add_product")
+            )
 
         conn = None
         cursor = None
@@ -369,6 +683,7 @@ def add_product():
         try:
 
             conn = get_db_connection()
+
             cursor = conn.cursor()
 
             cursor.execute(
@@ -384,13 +699,23 @@ def add_product():
                     location,
                     image
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES
+                (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
                 """,
                 (
                     session["user_id"],
                     name,
                     category,
-                    price,
+                    price_value,
                     unit,
                     farmer_name,
                     location,
@@ -400,18 +725,29 @@ def add_product():
 
             conn.commit()
 
-            flash("Product added successfully!", "success")
+            flash(
+                "Product added successfully!",
+                "success"
+            )
 
-            return redirect(url_for("farmer"))
+            return redirect(
+                url_for("farmer")
+            )
 
         except Error as e:
 
-            print("ADD PRODUCT ERROR:", e)
+            print(
+                "ADD PRODUCT ERROR:",
+                e
+            )
 
             if conn:
                 conn.rollback()
 
-            flash("Unable to add product.", "danger")
+            flash(
+                "Unable to add product.",
+                "danger"
+            )
 
         finally:
 
@@ -421,23 +757,42 @@ def add_product():
             if conn:
                 conn.close()
 
-    return render_template("add-product.html")
+    return render_template(
+        "add-product.html"
+    )
 
 
 # =========================================================
 # EDIT PRODUCT
 # =========================================================
 
-@app.route("/edit-product/<int:product_id>", methods=["GET", "POST"])
+@app.route(
+    "/edit-product/<int:product_id>",
+    methods=["GET", "POST"]
+)
 def edit_product(product_id):
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer_login")
+        )
 
     if session.get("role") != "farmer":
-        flash("Only farmers can edit products.", "danger")
-        return redirect(url_for("buyer"))
+
+        flash(
+            "Only farmers can edit products.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("buyer")
+        )
 
     conn = None
     cursor = None
@@ -445,7 +800,14 @@ def edit_product(product_id):
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+
+        cursor = conn.cursor(
+            dictionary=True
+        )
+
+        # -------------------------------------------------
+        # GET FARMER'S PRODUCT
+        # -------------------------------------------------
 
         cursor.execute(
             """
@@ -454,23 +816,140 @@ def edit_product(product_id):
             WHERE id = %s
             AND farmer_id = %s
             """,
-            (product_id, session["user_id"])
+            (
+                product_id,
+                session["user_id"]
+            )
         )
 
         product = cursor.fetchone()
 
         if not product:
-            flash("Product not found.", "danger")
-            return redirect(url_for("farmer"))
+
+            flash(
+                "Product not found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("farmer")
+            )
+
+        # -------------------------------------------------
+        # UPDATE PRODUCT
+        # -------------------------------------------------
 
         if request.method == "POST":
 
-            name = request.form.get("name", "").strip()
-            category = request.form.get("category", "").strip()
-            price = request.form.get("price", "0").strip()
-            unit = request.form.get("unit", "").strip()
-            location = request.form.get("location", "").strip()
-            image = request.form.get("image", "").strip()
+            name = request.form.get(
+                "name",
+                ""
+            ).strip()
+
+            category = request.form.get(
+                "category",
+                ""
+            ).strip()
+
+            price = request.form.get(
+                "price",
+                ""
+            ).strip()
+
+            unit = request.form.get(
+                "unit",
+                ""
+            ).strip()
+
+            location = request.form.get(
+                "location",
+                ""
+            ).strip()
+
+            image = request.form.get(
+                "image",
+                ""
+            ).strip()
+
+            # Validation
+
+            if not name:
+
+                flash(
+                    "Product name is required.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for(
+                        "edit_product",
+                        product_id=product_id
+                    )
+                )
+
+            if not category:
+
+                flash(
+                    "Product category is required.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for(
+                        "edit_product",
+                        product_id=product_id
+                    )
+                )
+
+            if not price:
+
+                flash(
+                    "Product price is required.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for(
+                        "edit_product",
+                        product_id=product_id
+                    )
+                )
+
+            if not unit:
+
+                flash(
+                    "Product unit is required.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for(
+                        "edit_product",
+                        product_id=product_id
+                    )
+                )
+
+            try:
+
+                price_value = float(price)
+
+                if price_value < 0:
+
+                    raise ValueError
+
+            except ValueError:
+
+                flash(
+                    "Please enter a valid price.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for(
+                        "edit_product",
+                        product_id=product_id
+                    )
+                )
 
             cursor.execute(
                 """
@@ -488,7 +967,7 @@ def edit_product(product_id):
                 (
                     name,
                     category,
-                    price,
+                    price_value,
                     unit,
                     location,
                     image,
@@ -499,20 +978,38 @@ def edit_product(product_id):
 
             conn.commit()
 
-            flash("Product updated successfully!", "success")
+            flash(
+                "Product updated successfully!",
+                "success"
+            )
 
-            return redirect(url_for("farmer"))
+            return redirect(
+                url_for("farmer")
+            )
+
+        return render_template(
+            "edit-product.html",
+            product=product
+        )
 
     except Error as e:
 
-        print("EDIT PRODUCT ERROR:", e)
+        print(
+            "EDIT PRODUCT ERROR:",
+            e
+        )
 
         if conn:
             conn.rollback()
 
-        flash("Unable to update product.", "danger")
+        flash(
+            "Unable to update product.",
+            "danger"
+        )
 
-        return redirect(url_for("farmer"))
+        return redirect(
+            url_for("farmer")
+        )
 
     finally:
 
@@ -522,26 +1019,37 @@ def edit_product(product_id):
         if conn:
             conn.close()
 
-    return render_template(
-        "edit-product.html",
-        product=product
-    )
-
 
 # =========================================================
 # DELETE PRODUCT
 # =========================================================
 
-@app.route("/farmer/delete-product/<int:product_id>")
+@app.route(
+    "/farmer/delete-product/<int:product_id>"
+)
 def delete_product(product_id):
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer_login")
+        )
 
     if session.get("role") != "farmer":
-        flash("Only farmers can delete products.", "danger")
-        return redirect(url_for("buyer"))
+
+        flash(
+            "Only farmers can delete products.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("buyer")
+        )
 
     conn = None
     cursor = None
@@ -549,7 +1057,14 @@ def delete_product(product_id):
     try:
 
         conn = get_db_connection()
+
         cursor = conn.cursor()
+
+        # -------------------------------------------------
+        # IMPORTANT
+        # Only the logged-in farmer can delete
+        # their own product.
+        # -------------------------------------------------
 
         cursor.execute(
             """
@@ -557,21 +1072,44 @@ def delete_product(product_id):
             WHERE id = %s
             AND farmer_id = %s
             """,
-            (product_id, session["user_id"])
+            (
+                product_id,
+                session["user_id"]
+            )
         )
+
+        deleted_rows = cursor.rowcount
 
         conn.commit()
 
-        flash("Product deleted successfully!", "success")
+        if deleted_rows > 0:
+
+            flash(
+                "Product deleted successfully!",
+                "success"
+            )
+
+        else:
+
+            flash(
+                "Product not found or you cannot delete it.",
+                "danger"
+            )
 
     except Error as e:
 
-        print("DELETE PRODUCT ERROR:", e)
+        print(
+            "DELETE PRODUCT ERROR:",
+            e
+        )
 
         if conn:
             conn.rollback()
 
-        flash("Unable to delete product.", "danger")
+        flash(
+            "Unable to delete product.",
+            "danger"
+        )
 
     finally:
 
@@ -581,25 +1119,60 @@ def delete_product(product_id):
         if conn:
             conn.close()
 
-    return redirect(url_for("farmer"))
+    return redirect(
+        url_for("farmer")
+    )
 
 
 # =========================================================
 # ADD TO CART
 # =========================================================
 
-@app.route("/add-to-cart", methods=["POST"])
+@app.route(
+    "/add-to-cart",
+    methods=["POST"]
+)
 def add_to_cart():
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
 
-    product_id = request.form.get("product_id")
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    # Farmer should not use buyer cart
+
+    if session.get("role") == "farmer":
+
+        flash(
+            "Farmers cannot use the buyer cart.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
+
+    product_id = request.form.get(
+        "product_id",
+        ""
+    ).strip()
 
     if not product_id:
-        flash("Product not selected.", "danger")
-        return redirect(url_for("buyer"))
+
+        flash(
+            "Product not selected.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("buyer")
+        )
 
     conn = None
     cursor = None
@@ -607,7 +1180,14 @@ def add_to_cart():
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+
+        cursor = conn.cursor(
+            dictionary=True
+        )
+
+        # -------------------------------------------------
+        # GET PRODUCT
+        # -------------------------------------------------
 
         cursor.execute(
             """
@@ -615,14 +1195,27 @@ def add_to_cart():
             FROM products
             WHERE id = %s
             """,
-            (product_id,)
+            (
+                product_id,
+            )
         )
 
         product = cursor.fetchone()
 
         if not product:
-            flash("Product not found.", "danger")
-            return redirect(url_for("buyer"))
+
+            flash(
+                "Product not found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("buyer")
+            )
+
+        # -------------------------------------------------
+        # CHECK EXISTING CART ITEM
+        # -------------------------------------------------
 
         cursor.execute(
             """
@@ -646,8 +1239,12 @@ def add_to_cart():
                 UPDATE cart
                 SET quantity = quantity + 1
                 WHERE id = %s
+                AND user_id = %s
                 """,
-                (existing_item["id"],)
+                (
+                    existing_item["id"],
+                    session["user_id"]
+                )
             )
 
         else:
@@ -666,7 +1263,18 @@ def add_to_cart():
                     image,
                     quantity
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES
+                (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
                 """,
                 (
                     session["user_id"],
@@ -674,25 +1282,43 @@ def add_to_cart():
                     product["name"],
                     product["price"],
                     product["unit"],
-                    product.get("farmer", ""),
-                    product.get("location", ""),
-                    product.get("image", ""),
+                    product.get(
+                        "farmer",
+                        ""
+                    ),
+                    product.get(
+                        "location",
+                        ""
+                    ),
+                    product.get(
+                        "image",
+                        ""
+                    ),
                     1
                 )
             )
 
         conn.commit()
 
-        flash("Product added to cart!", "success")
+        flash(
+            "Product added to cart!",
+            "success"
+        )
 
     except Error as e:
 
-        print("ADD TO CART ERROR:", e)
+        print(
+            "ADD TO CART ERROR:",
+            e
+        )
 
         if conn:
             conn.rollback()
 
-        flash("Unable to add product to cart.", "danger")
+        flash(
+            "Unable to add product to cart.",
+            "danger"
+        )
 
     finally:
 
@@ -702,7 +1328,9 @@ def add_to_cart():
         if conn:
             conn.close()
 
-    return redirect(url_for("cart"))
+    return redirect(
+        url_for("cart")
+    )
 
 
 # =========================================================
@@ -713,19 +1341,47 @@ def add_to_cart():
 def cart():
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    if session.get("role") == "farmer":
+
+        flash(
+            "Farmers cannot access buyer cart.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
 
     conn = None
     cursor = None
 
     cart_items = []
-    total = 0
+
+    # These are important because cart.html uses them.
+
+    total_items = 0
+
+    subtotal = 0.0
+
+    total = 0.0
 
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+
+        cursor = conn.cursor(
+            dictionary=True
+        )
 
         cursor.execute(
             """
@@ -734,24 +1390,61 @@ def cart():
             WHERE user_id = %s
             ORDER BY id DESC
             """,
-            (session["user_id"],)
+            (
+                session["user_id"],
+            )
         )
 
         cart_items = cursor.fetchall()
 
+        # -------------------------------------------------
+        # CALCULATE CART TOTALS
+        # -------------------------------------------------
+
         for item in cart_items:
 
-            item_total = float(item["price"]) * int(item["quantity"])
+            price = float(
+                item.get(
+                    "price",
+                    0
+                ) or 0
+            )
 
-            item["item_total"] = item_total
+            quantity = int(
+                item.get(
+                    "quantity",
+                    0
+                ) or 0
+            )
 
-            total += item_total
+            item_total = (
+                price * quantity
+            )
+
+            item["item_total"] = (
+                item_total
+            )
+
+            total_items += quantity
+
+            subtotal += item_total
+
+        # Current project has no separate tax/shipping
+        # calculation, so total = subtotal.
+
+        total = subtotal
 
     except Error as e:
 
-        print("CART ERROR:", e)
+        print(
+            "CART ERROR:",
+            e
+        )
 
-        flash("Unable to load cart.", "danger")
+        flash(
+            "Unable to load cart.",
+            "danger"
+        )
 
     finally:
 
@@ -761,22 +1454,38 @@ def cart():
         if conn:
             conn.close()
 
+    # -----------------------------------------------------
+    # IMPORTANT:
+    # cart.html expects:
+    # cart_items
+    # total_items
+    # subtotal
+    # total
+    # -----------------------------------------------------
+
     return render_template(
         "cart.html",
         cart_items=cart_items,
+        total_items=total_items,
+        subtotal=subtotal,
         total=total
     )
 
 
 # =========================================================
-# INCREASE CART
+# INCREASE CART QUANTITY
 # =========================================================
 
-@app.route("/increase-cart/<int:cart_id>")
+@app.route(
+    "/increase-cart/<int:cart_id>"
+)
 def increase_cart(cart_id):
 
     if "user_id" not in session:
-        return redirect(url_for("login"))
+
+        return redirect(
+            url_for("login")
+        )
 
     conn = None
     cursor = None
@@ -784,6 +1493,7 @@ def increase_cart(cart_id):
     try:
 
         conn = get_db_connection()
+
         cursor = conn.cursor()
 
         cursor.execute(
@@ -793,14 +1503,25 @@ def increase_cart(cart_id):
             WHERE id = %s
             AND user_id = %s
             """,
-            (cart_id, session["user_id"])
+            (
+                cart_id,
+                session["user_id"]
+            )
         )
 
         conn.commit()
 
     except Error as e:
 
-        print("INCREASE CART ERROR:", e)
+        print(
+            "INCREASE CART ERROR:",
+            e
+        )
+
+        flash(
+            "Unable to increase quantity.",
+            "danger"
+        )
 
     finally:
 
@@ -810,18 +1531,25 @@ def increase_cart(cart_id):
         if conn:
             conn.close()
 
-    return redirect(url_for("cart"))
+    return redirect(
+        url_for("cart")
+    )
 
 
 # =========================================================
-# DECREASE CART
+# DECREASE CART QUANTITY
 # =========================================================
 
-@app.route("/decrease-cart/<int:cart_id>")
+@app.route(
+    "/decrease-cart/<int:cart_id>"
+)
 def decrease_cart(cart_id):
 
     if "user_id" not in session:
-        return redirect(url_for("login"))
+
+        return redirect(
+            url_for("login")
+        )
 
     conn = None
     cursor = None
@@ -829,7 +1557,10 @@ def decrease_cart(cart_id):
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+
+        cursor = conn.cursor(
+            dictionary=True
+        )
 
         cursor.execute(
             """
@@ -838,14 +1569,21 @@ def decrease_cart(cart_id):
             WHERE id = %s
             AND user_id = %s
             """,
-            (cart_id, session["user_id"])
+            (
+                cart_id,
+                session["user_id"]
+            )
         )
 
         item = cursor.fetchone()
 
         if item:
 
-            if int(item["quantity"]) > 1:
+            quantity = int(
+                item["quantity"]
+            )
+
+            if quantity > 1:
 
                 cursor.execute(
                     """
@@ -854,7 +1592,10 @@ def decrease_cart(cart_id):
                     WHERE id = %s
                     AND user_id = %s
                     """,
-                    (cart_id, session["user_id"])
+                    (
+                        cart_id,
+                        session["user_id"]
+                    )
                 )
 
             else:
@@ -865,14 +1606,25 @@ def decrease_cart(cart_id):
                     WHERE id = %s
                     AND user_id = %s
                     """,
-                    (cart_id, session["user_id"])
+                    (
+                        cart_id,
+                        session["user_id"]
+                    )
                 )
 
             conn.commit()
 
     except Error as e:
 
-        print("DECREASE CART ERROR:", e)
+        print(
+            "DECREASE CART ERROR:",
+            e
+        )
+
+        flash(
+            "Unable to decrease quantity.",
+            "danger"
+        )
 
     finally:
 
@@ -882,18 +1634,25 @@ def decrease_cart(cart_id):
         if conn:
             conn.close()
 
-    return redirect(url_for("cart"))
+    return redirect(
+        url_for("cart")
+    )
 
 
 # =========================================================
 # REMOVE FROM CART
 # =========================================================
 
-@app.route("/remove-from-cart/<int:cart_id>")
+@app.route(
+    "/remove-from-cart/<int:cart_id>"
+)
 def remove_from_cart(cart_id):
 
     if "user_id" not in session:
-        return redirect(url_for("login"))
+
+        return redirect(
+            url_for("login")
+        )
 
     conn = None
     cursor = None
@@ -901,6 +1660,7 @@ def remove_from_cart(cart_id):
     try:
 
         conn = get_db_connection()
+
         cursor = conn.cursor()
 
         cursor.execute(
@@ -909,16 +1669,30 @@ def remove_from_cart(cart_id):
             WHERE id = %s
             AND user_id = %s
             """,
-            (cart_id, session["user_id"])
+            (
+                cart_id,
+                session["user_id"]
+            )
         )
 
         conn.commit()
 
-        flash("Item removed from cart.", "success")
+        flash(
+            "Item removed from cart.",
+            "success"
+        )
 
     except Error as e:
 
-        print("REMOVE CART ERROR:", e)
+        print(
+            "REMOVE CART ERROR:",
+            e
+        )
+
+        flash(
+            "Unable to remove item.",
+            "danger"
+        )
 
     finally:
 
@@ -928,7 +1702,9 @@ def remove_from_cart(cart_id):
         if conn:
             conn.close()
 
-    return redirect(url_for("cart"))
+    return redirect(
+        url_for("cart")
+    )
 
 
 # =========================================================
@@ -939,7 +1715,10 @@ def remove_from_cart(cart_id):
 def clear_cart():
 
     if "user_id" not in session:
-        return redirect(url_for("login"))
+
+        return redirect(
+            url_for("login")
+        )
 
     conn = None
     cursor = None
@@ -947,6 +1726,7 @@ def clear_cart():
     try:
 
         conn = get_db_connection()
+
         cursor = conn.cursor()
 
         cursor.execute(
@@ -954,16 +1734,29 @@ def clear_cart():
             DELETE FROM cart
             WHERE user_id = %s
             """,
-            (session["user_id"],)
+            (
+                session["user_id"],
+            )
         )
 
         conn.commit()
 
-        flash("Cart cleared.", "success")
+        flash(
+            "Cart cleared.",
+            "success"
+        )
 
     except Error as e:
 
-        print("CLEAR CART ERROR:", e)
+        print(
+            "CLEAR CART ERROR:",
+            e
+        )
+
+        flash(
+            "Unable to clear cart.",
+            "danger"
+        )
 
     finally:
 
@@ -973,7 +1766,9 @@ def clear_cart():
         if conn:
             conn.close()
 
-    return redirect(url_for("cart"))
+    return redirect(
+        url_for("cart")
+    )
 
 
 # =========================================================
@@ -984,19 +1779,45 @@ def clear_cart():
 def checkout():
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    if session.get("role") == "farmer":
+
+        flash(
+            "Farmers cannot access buyer checkout.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
 
     conn = None
     cursor = None
 
     cart_items = []
-    total = 0
+
+    total_items = 0
+
+    subtotal = 0.0
+
+    total = 0.0
 
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+
+        cursor = conn.cursor(
+            dictionary=True
+        )
 
         cursor.execute(
             """
@@ -1005,27 +1826,58 @@ def checkout():
             WHERE user_id = %s
             ORDER BY id DESC
             """,
-            (session["user_id"],)
+            (
+                session["user_id"],
+            )
         )
 
         cart_items = cursor.fetchall()
 
         for item in cart_items:
 
-            item["item_total"] = (
-                float(item["price"]) *
-                int(item["quantity"])
+            price = float(
+                item.get(
+                    "price",
+                    0
+                ) or 0
             )
 
-            total += item["item_total"]
+            quantity = int(
+                item.get(
+                    "quantity",
+                    0
+                ) or 0
+            )
+
+            item_total = (
+                price * quantity
+            )
+
+            item["item_total"] = (
+                item_total
+            )
+
+            total_items += quantity
+
+            subtotal += item_total
+
+        total = subtotal
 
     except Error as e:
 
-        print("CHECKOUT ERROR:", e)
+        print(
+            "CHECKOUT ERROR:",
+            e
+        )
 
-        flash("Unable to load checkout.", "danger")
+        flash(
+            "Unable to load checkout.",
+            "danger"
+        )
 
-        return redirect(url_for("cart"))
+        return redirect(
+            url_for("cart")
+        )
 
     finally:
 
@@ -1036,12 +1888,21 @@ def checkout():
             conn.close()
 
     if not cart_items:
-        flash("Your cart is empty.", "danger")
-        return redirect(url_for("cart"))
+
+        flash(
+            "Your cart is empty.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("cart")
+        )
 
     return render_template(
         "checkout.html",
         cart_items=cart_items,
+        total_items=total_items,
+        subtotal=subtotal,
         total=total
     )
 
@@ -1050,21 +1911,51 @@ def checkout():
 # PLACE ORDER
 # =========================================================
 
-@app.route("/place-order", methods=["POST"])
+@app.route(
+    "/place-order",
+    methods=["POST"]
+)
 def place_order():
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    if session.get("role") == "farmer":
+
+        flash(
+            "Farmers cannot place buyer orders.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
 
     customer_name = request.form.get(
         "customer_name",
-        session.get("user_name", "")
+        session.get(
+            "user_name",
+            ""
+        )
     ).strip()
 
-    phone = request.form.get("phone", "").strip()
+    phone = request.form.get(
+        "phone",
+        ""
+    ).strip()
 
-    address = request.form.get("address", "").strip()
+    address = request.form.get(
+        "address",
+        ""
+    ).strip()
 
     payment_method = request.form.get(
         "payment_method",
@@ -1076,14 +1967,38 @@ def place_order():
         ""
     ).strip()
 
-    if not customer_name or not phone or not address:
+    if not customer_name:
 
         flash(
-            "Please enter customer name, phone and address.",
+            "Please enter customer name.",
             "danger"
         )
 
-        return redirect(url_for("checkout"))
+        return redirect(
+            url_for("checkout")
+        )
+
+    if not phone:
+
+        flash(
+            "Please enter phone number.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("checkout")
+        )
+
+    if not address:
+
+        flash(
+            "Please enter delivery address.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("checkout")
+        )
 
     conn = None
     cursor = None
@@ -1091,9 +2006,15 @@ def place_order():
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
 
-        # Get cart
+        cursor = conn.cursor(
+            dictionary=True
+        )
+
+        # -------------------------------------------------
+        # GET CART
+        # -------------------------------------------------
+
         cursor.execute(
             """
             SELECT *
@@ -1101,27 +2022,78 @@ def place_order():
             WHERE user_id = %s
             ORDER BY id ASC
             """,
-            (session["user_id"],)
+            (
+                session["user_id"],
+            )
         )
 
         cart_items = cursor.fetchall()
 
         if not cart_items:
 
-            flash("Your cart is empty.", "danger")
+            flash(
+                "Your cart is empty.",
+                "danger"
+            )
 
-            return redirect(url_for("cart"))
+            return redirect(
+                url_for("cart")
+            )
 
-        total = 0
+        # -------------------------------------------------
+        # CALCULATE TOTAL
+        # -------------------------------------------------
+
+        total = 0.0
 
         for item in cart_items:
 
-            total += (
-                float(item["price"]) *
-                int(item["quantity"])
+            price = float(
+                item.get(
+                    "price",
+                    0
+                ) or 0
             )
 
-        # Create order
+            quantity = int(
+                item.get(
+                    "quantity",
+                    0
+                ) or 0
+            )
+
+            total += (
+                price * quantity
+            )
+
+        # -------------------------------------------------
+        # PAYMENT STATUS
+        # -------------------------------------------------
+
+        if payment_method.lower() in [
+            "cash on delivery",
+            "cod"
+        ]:
+
+            payment_status = "Pending"
+
+        else:
+
+            # For UPI/online payment, transaction ID
+            # can be stored if provided.
+
+            if transaction_id:
+
+                payment_status = "Paid"
+
+            else:
+
+                payment_status = "Pending"
+
+        # -------------------------------------------------
+        # CREATE ORDER
+        # -------------------------------------------------
+
         cursor.execute(
             """
             INSERT INTO orders
@@ -1137,7 +2109,17 @@ def place_order():
                 transaction_id
             )
             VALUES
-            (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
+            )
             """,
             (
                 session["user_id"],
@@ -1147,14 +2129,17 @@ def place_order():
                 total,
                 "Pending",
                 payment_method,
-                "Pending",
+                payment_status,
                 transaction_id
             )
         )
 
         order_id = cursor.lastrowid
 
-        # Insert order items
+        # -------------------------------------------------
+        # INSERT ORDER ITEMS
+        # -------------------------------------------------
+
         for item in cart_items:
 
             cursor.execute(
@@ -1172,7 +2157,17 @@ def place_order():
                     image
                 )
                 VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
                 """,
                 (
                     order_id,
@@ -1180,20 +2175,37 @@ def place_order():
                     item["product_name"],
                     item["price"],
                     item["unit"],
-                    item["quantity"],
-                    item.get("farmer", ""),
-                    item.get("location", ""),
-                    item.get("image", "")
+                    item.get(
+                        "quantity",
+                        1
+                    ),
+                    item.get(
+                        "farmer",
+                        ""
+                    ),
+                    item.get(
+                        "location",
+                        ""
+                    ),
+                    item.get(
+                        "image",
+                        ""
+                    )
                 )
             )
 
-        # Clear cart
+        # -------------------------------------------------
+        # CLEAR CART
+        # -------------------------------------------------
+
         cursor.execute(
             """
             DELETE FROM cart
             WHERE user_id = %s
             """,
-            (session["user_id"],)
+            (
+                session["user_id"],
+            )
         )
 
         conn.commit()
@@ -1203,11 +2215,16 @@ def place_order():
             "success"
         )
 
-        return redirect(url_for("orders"))
+        return redirect(
+            url_for("orders")
+        )
 
     except Error as e:
 
-        print("PLACE ORDER ERROR:", e)
+        print(
+            "PLACE ORDER ERROR:",
+            e
+        )
 
         if conn:
             conn.rollback()
@@ -1217,7 +2234,9 @@ def place_order():
             "danger"
         )
 
-        return redirect(url_for("checkout"))
+        return redirect(
+            url_for("checkout")
+        )
 
     finally:
 
@@ -1229,15 +2248,33 @@ def place_order():
 
 
 # =========================================================
-# ORDERS
+# BUYER ORDERS
 # =========================================================
 
 @app.route("/orders")
 def orders():
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    if session.get("role") == "farmer":
+
+        flash(
+            "Please use the farmer dashboard.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
 
     conn = None
     cursor = None
@@ -1247,7 +2284,14 @@ def orders():
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+
+        cursor = conn.cursor(
+            dictionary=True
+        )
+
+        # -------------------------------------------------
+        # GET BUYER ORDERS
+        # -------------------------------------------------
 
         cursor.execute(
             """
@@ -1256,10 +2300,16 @@ def orders():
             WHERE user_id = %s
             ORDER BY id DESC
             """,
-            (session["user_id"],)
+            (
+                session["user_id"],
+            )
         )
 
         orders_list = cursor.fetchall()
+
+        # -------------------------------------------------
+        # GET ITEMS FOR EACH ORDER
+        # -------------------------------------------------
 
         for order in orders_list:
 
@@ -1270,14 +2320,21 @@ def orders():
                 WHERE order_id = %s
                 ORDER BY id ASC
                 """,
-                (order["id"],)
+                (
+                    order["id"],
+                )
             )
 
-            order["items"] = cursor.fetchall()
+            order["items"] = (
+                cursor.fetchall()
+            )
 
     except Error as e:
 
-        print("ORDERS ERROR:", e)
+        print(
+            "ORDERS ERROR:",
+            e
+        )
 
         flash(
             "Unable to load orders.",
@@ -1309,12 +2366,26 @@ def orders():
 def update_order_status(order_id):
 
     if "user_id" not in session:
-        flash("Please login first.", "danger")
-        return redirect(url_for("login"))
+
+        flash(
+            "Please login first.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer_login")
+        )
 
     if session.get("role") != "farmer":
-        flash("Only farmers can update order status.", "danger")
-        return redirect(url_for("buyer"))
+
+        flash(
+            "Only farmers can update order status.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("buyer")
+        )
 
     status = request.form.get(
         "status",
@@ -1332,8 +2403,15 @@ def update_order_status(order_id):
     ]
 
     if status not in allowed_statuses:
-        flash("Invalid order status.", "danger")
-        return redirect(url_for("farmer"))
+
+        flash(
+            "Invalid order status.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
 
     conn = None
     cursor = None
@@ -1341,9 +2419,15 @@ def update_order_status(order_id):
     try:
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
 
-        # Check that this order contains farmer's product
+        cursor = conn.cursor(
+            dictionary=True
+        )
+
+        # -------------------------------------------------
+        # CHECK THAT ORDER CONTAINS THIS FARMER'S PRODUCT
+        # -------------------------------------------------
+
         cursor.execute(
             """
             SELECT oi.id
@@ -1354,7 +2438,10 @@ def update_order_status(order_id):
             """,
             (
                 order_id,
-                session.get("user_name", "")
+                session.get(
+                    "user_name",
+                    ""
+                )
             )
         )
 
@@ -1367,7 +2454,13 @@ def update_order_status(order_id):
                 "danger"
             )
 
-            return redirect(url_for("farmer"))
+            return redirect(
+                url_for("farmer")
+            )
+
+        # -------------------------------------------------
+        # UPDATE STATUS
+        # -------------------------------------------------
 
         cursor.execute(
             """
@@ -1390,7 +2483,10 @@ def update_order_status(order_id):
 
     except Error as e:
 
-        print("UPDATE ORDER STATUS ERROR:", e)
+        print(
+            "UPDATE ORDER STATUS ERROR:",
+            e
+        )
 
         if conn:
             conn.rollback()
@@ -1408,14 +2504,19 @@ def update_order_status(order_id):
         if conn:
             conn.close()
 
-    return redirect(url_for("farmer"))
+    return redirect(
+        url_for("farmer")
+    )
 
 
 # =========================================================
 # CONTACT
 # =========================================================
 
-@app.route("/contact", methods=["GET", "POST"])
+@app.route(
+    "/contact",
+    methods=["GET", "POST"]
+)
 def contact():
 
     if request.method == "POST":
@@ -1442,19 +2543,24 @@ def contact():
                 "danger"
             )
 
-            return redirect(url_for("contact"))
+            return redirect(
+                url_for("contact")
+            )
 
-        # Email functionality has been removed.
-        # This form only confirms submission.
+        # Email functionality intentionally removed.
 
         flash(
             "Thank you! Your message has been received.",
             "success"
         )
 
-        return redirect(url_for("contact"))
+        return redirect(
+            url_for("contact")
+        )
 
-    return render_template("contact.html")
+    return render_template(
+        "contact.html"
+    )
 
 
 # =========================================================
@@ -1464,7 +2570,10 @@ def contact():
 if __name__ == "__main__":
 
     port = int(
-        os.getenv("PORT", "5000")
+        os.getenv(
+            "PORT",
+            "5000"
+        )
     )
 
     app.run(
