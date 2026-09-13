@@ -954,133 +954,45 @@ def add_product():
 # EDIT PRODUCT
 # ============================================================
 
-@app.route("/edit-product/<int:product_id>", methods=["GET", "POST"])
+@app.route(
+    "/edit_product/<int:product_id>",
+    methods=["GET", "POST"]
+)
 def edit_product(product_id):
 
-    # Check farmer login
-    if "user_id" not in session or session.get("role") != "farmer":
-        flash("Please login as a farmer.", "warning")
-        return redirect(url_for("login"))
+    if "user_id" not in session:
 
-    conn = None
+        return redirect(
+            url_for("login")
+        )
+
+    if session.get("role") != "farmer":
+
+        return redirect(
+            url_for("buyer")
+        )
+
+    connection = get_db_connection()
+
+    if connection is None:
+
+        flash(
+            "Database connection failed.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("farmer")
+        )
+
     cursor = None
+    product = None
 
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
 
-        # Get the product belonging to the logged-in farmer
-        cursor.execute(
-            """
-            SELECT *
-            FROM products
-            WHERE id = %s AND farmer_id = %s
-            """,
-            (product_id, session["user_id"])
+        cursor = connection.cursor(
+            dictionary=True
         )
-
-        product = cursor.fetchone()
-
-        # Product not found
-        if not product:
-            flash("Product not found or you are not authorized to edit it.", "danger")
-            return redirect(url_for("farmer"))
-
-        # When Save Changes is clicked
-        if request.method == "POST":
-
-            name = request.form.get("name", "").strip()
-            category = request.form.get("category", "").strip()
-            price = request.form.get("price", "").strip()
-            unit = request.form.get("unit", "").strip()
-            farmer_name = request.form.get("farmer", "").strip()
-            location = request.form.get("location", "").strip()
-            image = request.form.get("image", "").strip()
-
-            # Basic validation
-            if not name or not category or not price or not unit or not farmer_name or not location:
-                flash("Please fill all required fields.", "danger")
-                return render_template(
-                    "edit_product.html",
-                    product=product
-                )
-
-            # Convert price
-            try:
-                price = float(price)
-
-                if price < 0:
-                    flash("Price cannot be negative.", "danger")
-                    return render_template(
-                        "edit_product.html",
-                        product=product
-                    )
-
-            except ValueError:
-                flash("Please enter a valid price.", "danger")
-                return render_template(
-                    "edit_product.html",
-                    product=product
-                )
-
-            # Update product
-            cursor.execute(
-                """
-                UPDATE products
-                SET
-                    name = %s,
-                    category = %s,
-                    price = %s,
-                    unit = %s,
-                    farmer = %s,
-                    location = %s,
-                    image = %s
-                WHERE id = %s AND farmer_id = %s
-                """,
-                (
-                    name,
-                    category,
-                    price,
-                    unit,
-                    farmer_name,
-                    location,
-                    image,
-                    product_id,
-                    session["user_id"]
-                )
-            )
-
-            conn.commit()
-
-            flash("Product updated successfully!", "success")
-
-            return redirect(url_for("farmer"))
-
-        # GET request
-        return render_template(
-            "edit_product.html",
-            product=product
-        )
-
-    except Error as e:
-
-        if conn:
-            conn.rollback()
-
-        print("EDIT PRODUCT ERROR:", e)
-
-        flash("Something went wrong while updating the product.", "danger")
-
-        return redirect(url_for("farmer"))
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if conn:
-            conn.close()
-
         # ====================================================
         # GET PRODUCT
         # ====================================================
