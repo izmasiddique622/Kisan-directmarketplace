@@ -33,6 +33,16 @@
             color: #198754;
         }
 
+        .register-link {
+            color: #198754;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
+        }
+
     </style>
 
 </head>
@@ -42,6 +52,8 @@
 <div class="container">
 
     <div class="login-box">
+
+        <!-- LOGO -->
 
         <div class="text-center">
 
@@ -55,6 +67,8 @@
 
         </div>
 
+
+        <!-- FLASH MESSAGES -->
 
         {% with messages = get_flashed_messages(with_categories=true) %}
 
@@ -73,7 +87,11 @@
         {% endwith %}
 
 
+        <!-- LOGIN FORM -->
+
         <form method="POST" action="{{ url_for('login') }}">
+
+            <!-- EMAIL -->
 
             <div class="mb-3">
 
@@ -91,6 +109,8 @@
             </div>
 
 
+            <!-- PASSWORD -->
+
             <div class="mb-3">
 
                 <label class="form-label">
@@ -107,6 +127,8 @@
             </div>
 
 
+            <!-- LOGIN BUTTON -->
+
             <button
                 type="submit"
                 class="btn btn-success w-100">
@@ -118,7 +140,30 @@
         </form>
 
 
+        <!-- REGISTER LINK -->
+
         <div class="text-center mt-4">
+
+            <p class="mb-0">
+
+                Don't have an account?
+
+                <a
+                    href="{{ url_for('register') }}"
+                    class="register-link">
+
+                    Create New Account
+
+                </a>
+
+            </p>
+
+        </div>
+
+
+        <!-- BACK TO HOME -->
+
+        <div class="text-center mt-3">
 
             <a
                 href="{{ url_for('home') }}"
@@ -130,6 +175,8 @@
 
         </div>
 
+
+        <!-- DEMO LOGIN -->
 
         <div class="text-center mt-4">
 
