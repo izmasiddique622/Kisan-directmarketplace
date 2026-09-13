@@ -2,13 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import mysql.connector
 from mysql.connector import Error
 import hashlib
-import smtplib
+import resend
 import os
 from dotenv import load_dotenv
-from email.message import EmailMessage
 
 load_dotenv()
 
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL")
 
 # =========================================================
 # FLASK APP
