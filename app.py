@@ -133,8 +133,8 @@ def farmer_login():
 
         if not email or not password:
             flash("Please enter email and password.", "danger")
-            return redirect(url_for("farmer_login"))
-
+            return render_template("farmer_login.html")
+            
         conn = None
         cursor = None
 
