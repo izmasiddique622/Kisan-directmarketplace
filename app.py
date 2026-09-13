@@ -133,8 +133,8 @@ def farmer_login():
 
         if not email or not password:
             flash("Please enter email and password.", "danger")
-            return render_template("farmer_login.html")
-            
+            return redirect(url_for("farmer_login"))
+
         conn = None
         cursor = None
 
@@ -158,7 +158,6 @@ def farmer_login():
             user = cursor.fetchone()
 
             if user:
-
                 session["user_id"] = user["id"]
                 session["user_name"] = user.get("name", "")
                 session["user_email"] = user.get("email", "")
@@ -183,7 +182,7 @@ def farmer_login():
 
         return redirect(url_for("farmer_login"))
 
-   return render_template("farmer_login.html")
+    return render_template("farmer_login.html")
 
 # =========================================================
 # LOGOUT
