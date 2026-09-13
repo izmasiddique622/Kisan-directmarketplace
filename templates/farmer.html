@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -613,6 +615,7 @@
         }
 
     </style>
+
 </head>
 
 <body>
@@ -798,7 +801,7 @@
 
                             <img
                                 src="{{ product['image'] }}"
-                                alt="{{ product['product_name'] }}"
+                                alt="{{ product['name'] }}"
                                 onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80';"
                             >
 
@@ -817,7 +820,7 @@
                         <div class="product-info">
 
                             <h3>
-                                {{ product["product_name"] }}
+                                {{ product["name"] }}
                             </h3>
 
                             <p>
@@ -851,7 +854,7 @@
                             <div class="product-actions">
 
                                 <a
-                                    href="/edit-product/{{ product['product_id'] }}"
+                                    href="/edit-product/{{ product['id'] }}"
                                     class="btn btn-blue"
                                 >
                                     ✏️ Edit
@@ -860,7 +863,7 @@
 
                                 <form
                                     method="POST"
-                                    action="/farmer/delete-product/{{ product['product_id'] }}"
+                                    action="/farmer/delete-product/{{ product['id'] }}"
                                     style="display:inline;"
                                     onsubmit="return confirm('Are you sure you want to delete this product?');"
                                 >
@@ -1205,7 +1208,7 @@
 
 
                             <!-- =================================================
-                                 DELIVERY SECTION — ALWAYS AT BOTTOM
+                                 DELIVERY SECTION
                             ================================================== -->
 
                             <div class="delivery-section">
