@@ -1,15 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
 from mysql.connector import Error
-import hashlib
+
 import resend
 import os
+import hashlib
 from dotenv import load_dotenv
 
 load_dotenv()
 
-RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL")
+# =========================================================
+# EMAIL CONFIGURATION
+# =========================================================
+
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "")
+RESEND_ADMIN_EMAIL = os.getenv("RESEND_ADMIN_EMAIL", "")
+
 
 # =========================================================
 # FLASK APP
@@ -24,48 +31,57 @@ app.secret_key = os.getenv(
 
 
 # =========================================================
-# EMAIL CONFIGURATION
-# =========================================================
-
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS", "")
-EMAIL_APP_PASSWORD = os.getenv("EMAIL_APP_PASSWORD", "")
-
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 465
-
-
-# =========================================================
-# SEND EMAIL
+# SEND EMAIL USING RESEND
 # =========================================================
 
 def send_email(to_email, subject, message):
+
     try:
-        if not to_email or not EMAIL_ADDRESS or not EMAIL_APP_PASSWORD:
-            print("EMAIL NOT CONFIGURED")
+
+        if (
+            not to_email
+            or not RESEND_API_KEY
+            or not RESEND_FROM_EMAIL
+        ):
+
+            print("RESEND EMAIL NOT CONFIGURED")
+
             return False
 
-        email = EmailMessage()
-        email["From"] = EMAIL_ADDRESS
-        email["To"] = to_email
-        email["Subject"] = subject
-        email.set_content(message)
+        resend.api_key = RESEND_API_KEY
 
-        with smtplib.SMTP_SSL(
-            SMTP_SERVER,
-            SMTP_PORT,
-            timeout=8
-        ) as server:
-            server.login(
-                EMAIL_ADDRESS,
-                EMAIL_APP_PASSWORD
-            )
-            server.send_message(email)
+        params = {
 
-        print("EMAIL SENT SUCCESSFULLY TO:", to_email)
+            "from": RESEND_FROM_EMAIL,
+
+            "to": [to_email],
+
+            "subject": subject,
+
+            "text": message
+        }
+
+        email = resend.Emails.send(params)
+
+        print(
+            "EMAIL SENT SUCCESSFULLY TO:",
+            to_email
+        )
+
+        print(
+            "RESEND RESPONSE:",
+            email
+        )
+
         return True
 
     except Exception as e:
-        print("EMAIL ERROR:", e)
+
+        print(
+            "RESEND EMAIL ERROR:",
+            e
+        )
+
         return False
 
 
@@ -74,16 +90,34 @@ def send_email(to_email, subject, message):
 # =========================================================
 
 def get_db_connection():
+
     return mysql.connector.connect(
+
         host=os.getenv("DB_HOST"),
-        port=int(os.getenv("DB_PORT", "3306")),
+
+        port=int(
+            os.getenv(
+                "DB_PORT",
+                "3306"
+            )
+        ),
+
         user=os.getenv("DB_USER"),
+
         password=os.getenv("DB_PASSWORD"),
+
         database=os.getenv("DB_NAME"),
-        ssl_ca=os.path.join(os.path.dirname(__file__), "ca.pem"),
+
+        ssl_ca=os.path.join(
+            os.path.dirname(__file__),
+            "ca.pem"
+        ),
+
         ssl_disabled=False,
+
         connection_timeout=10
     )
+
 
 # =========================================================
 # PASSWORD HASH
@@ -240,9 +274,11 @@ def login():
         finally:
 
             if cursor:
+
                 cursor.close()
 
             if db:
+
                 db.close()
 
     return render_template(
@@ -371,9 +407,11 @@ def farmer_login():
         finally:
 
             if cursor:
+
                 cursor.close()
 
             if db:
+
                 db.close()
 
     return render_template(
@@ -460,9 +498,11 @@ def buyer():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -659,9 +699,11 @@ def farmer():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -888,6 +930,7 @@ def update_order_status(order_id):
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -908,9 +951,11 @@ def update_order_status(order_id):
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -1123,6 +1168,7 @@ def add_product():
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -1143,9 +1189,11 @@ def add_product():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -1194,10 +1242,6 @@ def edit_product(product_id):
             dictionary=True
         )
 
-        # =================================================
-        # GET PRODUCT
-        # =================================================
-
         cursor.execute("""
 
             SELECT
@@ -1234,20 +1278,12 @@ def edit_product(product_id):
                 url_for("farmer")
             )
 
-        # =================================================
-        # SHOW EDIT FORM
-        # =================================================
-
         if request.method == "GET":
 
             return render_template(
                 "edit_product.html",
                 product=product
             )
-
-        # =================================================
-        # GET FORM DATA
-        # =================================================
 
         name = request.form.get(
             "name",
@@ -1278,10 +1314,6 @@ def edit_product(product_id):
             "image",
             ""
         ).strip()
-
-        # =================================================
-        # VALIDATION
-        # =================================================
 
         if not name:
 
@@ -1359,10 +1391,6 @@ def edit_product(product_id):
                 product=product
             )
 
-        # =================================================
-        # UPDATE PRODUCT
-        # =================================================
-
         cursor.execute("""
 
             UPDATE products
@@ -1404,6 +1432,7 @@ def edit_product(product_id):
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -1424,9 +1453,11 @@ def edit_product(product_id):
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -1505,6 +1536,7 @@ def delete_product(product_id):
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -1520,9 +1552,11 @@ def delete_product(product_id):
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
     return redirect(
@@ -1740,6 +1774,7 @@ def add_to_cart():
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -1760,9 +1795,11 @@ def add_to_cart():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -1877,9 +1914,11 @@ def cart():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -1933,6 +1972,7 @@ def increase_cart(cart_id):
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -1943,9 +1983,11 @@ def increase_cart(cart_id):
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
     return redirect(
@@ -2047,6 +2089,7 @@ def decrease_cart(cart_id):
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -2057,9 +2100,11 @@ def decrease_cart(cart_id):
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
     return redirect(
@@ -2120,6 +2165,7 @@ def remove_from_cart(cart_id):
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -2135,9 +2181,11 @@ def remove_from_cart(cart_id):
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
     return redirect(
@@ -2193,6 +2241,7 @@ def clear_cart():
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -2203,9 +2252,11 @@ def clear_cart():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
     return redirect(
@@ -2304,9 +2355,11 @@ def checkout():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -2333,10 +2386,6 @@ def place_order():
         )
 
     user_id = session["user_id"]
-
-    # =====================================================
-    # CHECKOUT DETAILS
-    # =====================================================
 
     customer_name = request.form.get(
         "customer_name",
@@ -2766,6 +2815,7 @@ def place_order():
     except Error as e:
 
         if db:
+
             db.rollback()
 
         print(
@@ -2786,10 +2836,13 @@ def place_order():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
+
 
 # =========================================================
 # BUYER ORDERS
@@ -2918,9 +2971,11 @@ def orders():
     finally:
 
         if cursor:
+
             cursor.close()
 
         if db:
+
             db.close()
 
 
@@ -3034,7 +3089,7 @@ def contact():
         # =================================================
 
         email_sent = send_email(
-            EMAIL_ADDRESS,
+            RESEND_ADMIN_EMAIL,
             email_subject,
             email_message
         )
@@ -3078,4 +3133,3 @@ if __name__ == "__main__":
             )
         )
     )
-
