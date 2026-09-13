@@ -955,7 +955,7 @@ def add_product():
 # ============================================================
 
 @app.route(
-    "/edit-product/<int:product_id>",
+    "/edit_product/<int:product_id>",
     methods=["GET", "POST"]
 )
 def edit_product(product_id):
