@@ -75,66 +75,106 @@ def register():
 
     if request.method == "POST":
 
-        name = request.form.get("name", "").strip()
-        email = request.form.get("email", "").strip().lower()
-        password = request.form.get("password", "")
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
+
+        email = request.form.get(
+            "email",
+            ""
+        ).strip().lower()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
         confirm_password = request.form.get(
             "confirm_password",
             ""
         )
-        role = request.form.get("role", "buyer").strip().lower()
+
+        role = request.form.get(
+            "role",
+            "buyer"
+        ).strip().lower()
 
         # ----------------------------
-        # Basic validation
+        # Validation
         # ----------------------------
 
         if not name:
+
             flash(
                 "Please enter your name.",
                 "danger"
             )
-            return render_template("register.html")
+
+            return render_template(
+                "register.html"
+            )
 
         if not email:
+
             flash(
                 "Please enter your email.",
                 "danger"
             )
-            return render_template("register.html")
+
+            return render_template(
+                "register.html"
+            )
 
         if not password:
+
             flash(
                 "Please enter a password.",
                 "danger"
             )
-            return render_template("register.html")
+
+            return render_template(
+                "register.html"
+            )
 
         if password != confirm_password:
+
             flash(
                 "Passwords do not match.",
                 "danger"
             )
-            return render_template("register.html")
+
+            return render_template(
+                "register.html"
+            )
 
         if len(password) < 6:
+
             flash(
                 "Password must be at least 6 characters.",
                 "danger"
             )
-            return render_template("register.html")
 
-        # Only buyer and farmer are allowed
+            return render_template(
+                "register.html"
+            )
+
+        # Only buyer and farmer
         if role not in ["buyer", "farmer"]:
             role = "buyer"
 
         connection = get_db_connection()
 
         if connection is None:
+
             flash(
                 "Database connection failed.",
                 "danger"
             )
-            return render_template("register.html")
+
+            return render_template(
+                "register.html"
+            )
 
         cursor = None
 
@@ -158,6 +198,7 @@ def register():
             existing_user = cursor.fetchone()
 
             if existing_user:
+
                 flash(
                     "Email already registered. Please login.",
                     "warning"
@@ -171,17 +212,30 @@ def register():
             # Hash password
             # ----------------------------
 
-            hashed_password = hash_password(password)
+            hashed_password = hash_password(
+                password
+            )
 
             # ----------------------------
-            # Insert new user
+            # Insert user
             # ----------------------------
 
             cursor.execute(
                 """
                 INSERT INTO users
-                (name, email, password, role)
-                VALUES (%s, %s, %s, %s)
+                (
+                    name,
+                    email,
+                    password,
+                    role
+                )
+                VALUES
+                (
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
                 """,
                 (
                     name,
@@ -600,9 +654,9 @@ def farmer():
             dictionary=True
         )
 
-        # ----------------------------
-        # Farmer products
-        # ----------------------------
+        # ====================================================
+        # FARMER PRODUCTS
+        # ====================================================
 
         cursor.execute(
             """
@@ -616,9 +670,13 @@ def farmer():
 
         products = cursor.fetchall()
 
-        # ----------------------------
-        # Farmer orders
-        # ----------------------------
+        # ====================================================
+        # FARMER ORDERS
+        # ====================================================
+        # IMPORTANT:
+        # We use products.farmer_id instead of matching
+        # farmer names.
+        # ====================================================
 
         cursor.execute(
             """
@@ -632,9 +690,21 @@ def farmer():
                 o.total,
                 o.status,
                 o.created_at,
-                COALESCE(o.payment_method, '') AS payment_method,
-                COALESCE(o.payment_status, '') AS payment_status,
-                COALESCE(o.transaction_id, '') AS transaction_id,
+
+                COALESCE(
+                    o.payment_method,
+                    ''
+                ) AS payment_method,
+
+                COALESCE(
+                    o.payment_status,
+                    ''
+                ) AS payment_status,
+
+                COALESCE(
+                    o.transaction_id,
+                    ''
+                ) AS transaction_id,
 
                 oi.id AS order_item_id,
                 oi.product_id,
@@ -651,13 +721,16 @@ def farmer():
             INNER JOIN order_items oi
                 ON o.id = oi.order_id
 
-            WHERE oi.farmer = %s
+            INNER JOIN products p
+                ON oi.product_id = p.id
+
+            WHERE p.farmer_id = %s
 
             ORDER BY
                 o.id DESC,
                 oi.id ASC
             """,
-            (session["user_name"],)
+            (farmer_id,)
         )
 
         orders_list = cursor.fetchall()
@@ -913,6 +986,7 @@ def edit_product(product_id):
         )
 
     cursor = None
+    product = None
 
     try:
 
@@ -920,9 +994,9 @@ def edit_product(product_id):
             dictionary=True
         )
 
-        # ----------------------------
-        # Check product belongs to farmer
-        # ----------------------------
+        # ====================================================
+        # GET PRODUCT
+        # ====================================================
 
         cursor.execute(
             """
@@ -942,7 +1016,7 @@ def edit_product(product_id):
         if not product:
 
             flash(
-                "Product not found.",
+                "Product not found or you do not have permission to edit it.",
                 "danger"
             )
 
@@ -950,9 +1024,9 @@ def edit_product(product_id):
                 url_for("farmer")
             )
 
-        # ----------------------------
-        # Update product
-        # ----------------------------
+        # ====================================================
+        # UPDATE PRODUCT
+        # ====================================================
 
         if request.method == "POST":
 
@@ -986,9 +1060,41 @@ def edit_product(product_id):
                 ""
             ).strip()
 
+            # ----------------------------
+            # Required fields
+            # ----------------------------
+
+            if not name or not category or not price or not unit:
+
+                flash(
+                    "Please fill all required fields.",
+                    "danger"
+                )
+
+                return render_template(
+                    "edit-product.html",
+                    product=product
+                )
+
+            # ----------------------------
+            # Price validation
+            # ----------------------------
+
             try:
 
                 price = float(price)
+
+                if price <= 0:
+
+                    flash(
+                        "Price must be greater than 0.",
+                        "danger"
+                    )
+
+                    return render_template(
+                        "edit-product.html",
+                        product=product
+                    )
 
             except ValueError:
 
@@ -1002,9 +1108,14 @@ def edit_product(product_id):
                     product=product
                 )
 
+            # =================================================
+            # UPDATE
+            # =================================================
+
             cursor.execute(
                 """
                 UPDATE products
+
                 SET
                     name = %s,
                     category = %s,
@@ -1012,6 +1123,7 @@ def edit_product(product_id):
                     unit = %s,
                     location = %s,
                     image = %s
+
                 WHERE id = %s
                 AND farmer_id = %s
                 """,
@@ -1044,6 +1156,9 @@ def edit_product(product_id):
             "EDIT PRODUCT ERROR:",
             e
         )
+
+        if connection:
+            connection.rollback()
 
         flash(
             "Unable to edit product.",
@@ -1107,6 +1222,40 @@ def delete_product(product_id):
     try:
 
         cursor = connection.cursor()
+
+        # ====================================================
+        # Check product belongs to logged-in farmer
+        # ====================================================
+
+        cursor.execute(
+            """
+            SELECT id
+            FROM products
+            WHERE id = %s
+            AND farmer_id = %s
+            """,
+            (
+                product_id,
+                session["user_id"]
+            )
+        )
+
+        product = cursor.fetchone()
+
+        if not product:
+
+            flash(
+                "Product not found or you do not have permission to delete it.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("farmer")
+            )
+
+        # ====================================================
+        # Delete product
+        # ====================================================
 
         cursor.execute(
             """
@@ -1233,12 +1382,14 @@ def add_to_cart():
             )
 
         # ----------------------------
-        # Check existing cart item
+        # Existing cart item
         # ----------------------------
 
         cursor.execute(
             """
-            SELECT id, quantity
+            SELECT
+                id,
+                quantity
             FROM cart
             WHERE user_id = %s
             AND product_id = %s
@@ -1366,6 +1517,7 @@ def cart():
         )
 
     cursor = None
+
     cart_items = []
 
     total_items = 0
@@ -1717,6 +1869,7 @@ def checkout():
         )
 
     cursor = None
+
     cart_items = []
     total = 0
 
@@ -1923,7 +2076,10 @@ def place_order():
             (
                 session["user_id"],
                 customer_name,
-                session.get("user_email", ""),
+                session.get(
+                    "user_email",
+                    ""
+                ),
                 phone,
                 address,
                 total,
@@ -2075,7 +2231,7 @@ def orders():
         orders_list = cursor.fetchall()
 
         # ----------------------------
-        # Get items for each order
+        # Get order items
         # ----------------------------
 
         for order in orders_list:
@@ -2163,31 +2319,48 @@ def update_order_status(order_id):
 
         cursor = connection.cursor()
 
+        # ====================================================
+        # Update only if this order contains a product
+        # belonging to the logged-in farmer.
+        # ====================================================
+
         cursor.execute(
             """
-            UPDATE orders
-            SET status = %s
-            WHERE id = %s
-            AND id IN
-            (
-                SELECT order_id
-                FROM order_items
-                WHERE farmer = %s
-            )
+            UPDATE orders o
+
+            INNER JOIN order_items oi
+                ON o.id = oi.order_id
+
+            INNER JOIN products p
+                ON oi.product_id = p.id
+
+            SET o.status = %s
+
+            WHERE o.id = %s
+            AND p.farmer_id = %s
             """,
             (
                 status,
                 order_id,
-                session["user_name"]
+                session["user_id"]
             )
         )
 
         connection.commit()
 
-        flash(
-            "Order status updated successfully!",
-            "success"
-        )
+        if cursor.rowcount > 0:
+
+            flash(
+                "Order status updated successfully!",
+                "success"
+            )
+
+        else:
+
+            flash(
+                "Order not found or you do not have permission to update it.",
+                "warning"
+            )
 
     except Error as e:
 
