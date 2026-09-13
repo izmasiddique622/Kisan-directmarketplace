@@ -38,53 +38,33 @@ SMTP_PORT = 465
 # =========================================================
 
 def send_email(to_email, subject, message):
-
     try:
-
         if not to_email or not EMAIL_ADDRESS or not EMAIL_APP_PASSWORD:
-
-            print(
-                "EMAIL NOT CONFIGURED: "
-                "Set EMAIL_ADDRESS and EMAIL_APP_PASSWORD "
-                "in environment variables."
-            )
-
+            print("EMAIL NOT CONFIGURED")
             return False
 
         email = EmailMessage()
-
         email["From"] = EMAIL_ADDRESS
         email["To"] = to_email
         email["Subject"] = subject
-
         email.set_content(message)
 
         with smtplib.SMTP_SSL(
             SMTP_SERVER,
-            SMTP_PORT
+            SMTP_PORT,
+            timeout=8
         ) as server:
-
             server.login(
                 EMAIL_ADDRESS,
                 EMAIL_APP_PASSWORD
             )
-
             server.send_message(email)
 
-        print(
-            "EMAIL SENT SUCCESSFULLY TO:",
-            to_email
-        )
-
+        print("EMAIL SENT SUCCESSFULLY TO:", to_email)
         return True
 
     except Exception as e:
-
-        print(
-            "EMAIL ERROR:",
-            e
-        )
-
+        print("EMAIL ERROR:", e)
         return False
 
 
@@ -2810,7 +2790,6 @@ def place_order():
         if db:
             db.close()
 
-
 # =========================================================
 # BUYER ORDERS
 # =========================================================
@@ -3098,3 +3077,5 @@ if __name__ == "__main__":
             )
         )
     )
+
+ye proper hai
