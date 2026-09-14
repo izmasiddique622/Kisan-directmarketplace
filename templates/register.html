@@ -32,7 +32,7 @@
         }
 
         .register-card {
-            background: white;
+            background-color: white;
             padding: 35px;
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.10);
@@ -53,10 +53,18 @@
             border-radius: 8px;
         }
 
-        .btn-success {
+        .btn-register {
+            background-color: #198754;
+            color: white;
             padding: 12px;
+            border: none;
             border-radius: 8px;
             font-weight: bold;
+        }
+
+        .btn-register:hover {
+            background-color: #146c43;
+            color: white;
         }
 
         .login-link {
@@ -75,19 +83,19 @@
 
 <!-- NAVBAR -->
 
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar">
     <div class="container">
 
-        <a class="navbar-brand fw-bold" href="/">
+        <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">
             🌾 Kisan Direct Marketplace
         </a>
 
         <div>
-            <a class="nav-link d-inline-block" href="/">
+            <a class="nav-link d-inline-block" href="{{ url_for('home') }}">
                 Home
             </a>
 
-            <a class="nav-link d-inline-block" href="/login">
+            <a class="nav-link d-inline-block" href="{{ url_for('login') }}">
                 Login
             </a>
         </div>
@@ -101,6 +109,8 @@
 <div class="container register-container">
 
     <div class="register-card">
+
+        <!-- TITLE -->
 
         <div class="text-center mb-4">
 
@@ -134,21 +144,15 @@
         {% endwith %}
 
 
-        <!-- FORM -->
+        <!-- REGISTER FORM -->
 
-        <form
-            action="{{ url_for('register') }}"
-            method="POST"
-        >
+        <form action="{{ url_for('register') }}" method="POST">
 
-            <!-- NAME -->
+            <!-- FULL NAME -->
 
             <div class="mb-3">
 
-                <label
-                    for="name"
-                    class="form-label"
-                >
+                <label for="name" class="form-label">
                     Full Name
                 </label>
 
@@ -168,10 +172,7 @@
 
             <div class="mb-3">
 
-                <label
-                    for="email"
-                    class="form-label"
-                >
+                <label for="email" class="form-label">
                     Email Address
                 </label>
 
@@ -191,10 +192,7 @@
 
             <div class="mb-3">
 
-                <label
-                    for="password"
-                    class="form-label"
-                >
+                <label for="password" class="form-label">
                     Password
                 </label>
 
@@ -219,10 +217,7 @@
 
             <div class="mb-3">
 
-                <label
-                    for="confirm_password"
-                    class="form-label"
-                >
+                <label for="confirm_password" class="form-label">
                     Confirm Password
                 </label>
 
@@ -239,14 +234,11 @@
             </div>
 
 
-            <!-- ROLE -->
+            <!-- REGISTER AS -->
 
             <div class="mb-4">
 
-                <label
-                    for="role"
-                    class="form-label"
-                >
+                <label for="role" class="form-label">
                     Register As
                 </label>
 
@@ -256,6 +248,10 @@
                     name="role"
                     required
                 >
+
+                    <option value="" selected disabled>
+                        Select account type
+                    </option>
 
                     <option value="buyer">
                         Buyer
@@ -270,11 +266,11 @@
             </div>
 
 
-            <!-- REGISTER BUTTON -->
+            <!-- CREATE ACCOUNT -->
 
             <button
                 type="submit"
-                class="btn btn-success w-100"
+                class="btn-register w-100"
             >
                 Create Account
             </button>
@@ -287,7 +283,6 @@
         <div class="text-center mt-4">
 
             <p class="mb-0">
-
                 Already have an account?
 
                 <a
@@ -296,7 +291,6 @@
                 >
                     Login here
                 </a>
-
             </p>
 
         </div>
