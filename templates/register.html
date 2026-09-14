@@ -19,7 +19,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 30px 15px;
+            padding: 25px 15px;
         }
 
         .register-card {
@@ -28,13 +28,15 @@
             background: white;
             padding: 35px 45px;
             border-radius: 18px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.10);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.10);
         }
 
         .register-title {
             color: #198754;
+            font-size: 40px;
             font-weight: bold;
             text-align: center;
+            margin-bottom: 10px;
         }
 
         .register-subtitle {
@@ -45,25 +47,32 @@
         }
 
         .form-label {
-            font-weight: 600;
             font-size: 18px;
+            font-weight: bold;
         }
 
         .form-control,
         .form-select {
-            padding: 13px;
-            border-radius: 9px;
+            height: 62px;
+            padding: 12px 15px;
+            border-radius: 10px;
             font-size: 17px;
+        }
+
+        .password-note {
+            color: #555;
+            font-size: 16px;
+            margin-top: 5px;
         }
 
         .btn-register {
             width: 100%;
+            height: 58px;
             background-color: #198754;
             color: white;
-            padding: 13px;
             border: none;
             border-radius: 9px;
-            font-size: 18px;
+            font-size: 19px;
             font-weight: bold;
         }
 
@@ -71,131 +80,180 @@
             background-color: #146c43;
             color: white;
         }
+
+        .alert {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
 <body>
 
-<div class="register-card">
+    <div class="register-card">
 
-    <h1 class="register-title">
-        Create Account
-    </h1>
-
-    <p class="register-subtitle">
-        Register for Kisan Direct Marketplace
-    </p>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <form action="{{ url_for('register') }}" method="POST">
-
-        <div class="mb-4">
-            <label class="form-label" for="name">
-                Full Name
-            </label>
-
-            <input
-                type="text"
-                class="form-control"
-                id="name"
-                name="name"
-                placeholder="Enter your full name"
-                required
-            >
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="email">
-                Email Address
-            </label>
-
-            <input
-                type="email"
-                class="form-control"
-                id="email"
-                name="email"
-                placeholder="Enter your email"
-                required
-            >
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="password">
-                Password
-            </label>
-
-            <input
-                type="password"
-                class="form-control"
-                id="password"
-                name="password"
-                placeholder="Enter password"
-                minlength="6"
-                required
-            >
-
-            <small class="text-muted">
-                Password must be at least 6 characters.
-            </small>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="confirm_password">
-                Confirm Password
-            </label>
-
-            <input
-                type="password"
-                class="form-control"
-                id="confirm_password"
-                name="confirm_password"
-                placeholder="Re-enter password"
-                minlength="6"
-                required
-            >
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="role">
-                Register As
-            </label>
-
-            <select
-                class="form-select"
-                id="role"
-                name="role"
-                required
-            >
-                <option value="" selected disabled>
-                    Select account type
-                </option>
-
-                <option value="buyer">
-                    Buyer
-                </option>
-
-                <option value="farmer">
-                    Farmer
-                </option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn-register">
+        <h1 class="register-title">
             Create Account
-        </button>
+        </h1>
 
-    </form>
+        <p class="register-subtitle">
+            Register for Kisan Direct Marketplace
+        </p>
 
-</div>
+
+        <!-- Flash Messages -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- Register Form -->
+
+        <form action="{{ url_for('register') }}" method="POST">
+
+
+            <!-- Full Name -->
+
+            <div class="mb-4">
+
+                <label for="name" class="form-label">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    name="name"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div class="mb-4">
+
+                <label for="email" class="form-label">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Password -->
+
+            <div class="mb-4">
+
+                <label for="password" class="form-label">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    placeholder="Enter password"
+                    minlength="6"
+                    required
+                >
+
+                <div class="password-note">
+                    Password must be at least 6 characters.
+                </div>
+
+            </div>
+
+
+            <!-- Confirm Password -->
+
+            <div class="mb-4">
+
+                <label for="confirm_password" class="form-label">
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    class="form-control"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Re-enter password"
+                    minlength="6"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Register As -->
+
+            <div class="mb-4">
+
+                <label for="role" class="form-label">
+                    Register As
+                </label>
+
+                <select
+                    class="form-select"
+                    id="role"
+                    name="role"
+                    required
+                >
+
+                    <option value="" selected disabled>
+                        Select account type
+                    </option>
+
+                    <option value="buyer">
+                        Buyer
+                    </option>
+
+                    <option value="farmer">
+                        Farmer
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Create Account Button -->
+
+            <button
+                type="submit"
+                class="btn-register"
+            >
+                Create Account
+            </button>
+
+        </form>
+
+    </div>
 
 </body>
 </html>
