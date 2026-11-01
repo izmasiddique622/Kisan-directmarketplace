@@ -854,11 +854,11 @@
                             <div class="product-actions">
 
                                 <a
-                                    href="/edit_product/{{ product['id'] }}"
-                                    class="btn btn-blue"
-                                >
-                                    ✏️ Edit
-                                </a>
+    href="{{ url_for('edit_product', product_id=product['id']) }}"
+    class="btn btn-blue"
+>
+    ✏️ Edit
+</a>
 
 
                                 <form
