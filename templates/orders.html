@@ -751,11 +751,7 @@
 
                     <div class="tracking-status">
 
-                        {% if order["delivery_status"] %}
-                            {{ order["delivery_status"] }}
-                        {% else %}
-                            Order Placed
-                        {% endif %}
+                        {{ order["status"] or "Order Placed" }}
 
                     </div>
 
@@ -791,8 +787,7 @@
 
                     <!-- CURRENT STATUS -->
 
-                    {% set current_status = order["delivery_status"] or "Order Placed" %}
-
+                {% set current_status = order["status"] or "Order Placed" %}
 
                     <!-- TRACKING STEPS -->
 
